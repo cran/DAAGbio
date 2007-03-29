@@ -1,0 +1,5 @@
+SpotType	ID	Name	Color
+gene	*	*	black
+negative	*	[1-9]*	brown
+blank	*	-	yellow
+diff-exp ctl	*	DH*	blue

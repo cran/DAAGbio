@@ -1,0 +1,7 @@
+SlideNumber	FileName	Cy3	Cy5
+       221a	coral551.spot	post	pre 
+       221b	coral552.spot	pre	post
+       223a	coral553.spot	post	pre 
+       223b	coral554.spot	pre	post
+       224a	coral555.spot	post	pre 
+       224b	coral556.spot	pre	post

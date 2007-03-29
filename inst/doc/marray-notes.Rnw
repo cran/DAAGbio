@@ -1,0 +1,677 @@
+% \VignetteIndexEntry{Laboratory Notes - Analysis of Microarray Data}
+% \VignettePackage{DAAGbio}
+\documentclass[a4paper,9pt]{article}
+\usepackage{a4wide}
+\usepackage{graphicx,color}
+\usepackage{amsmath,amssymb}
+\usepackage{fancyvrb}
+% \usepackage{float}
+\usepackage{url}
+% \usepackage{exercises}
+\VerbatimFootnotes
+\begin{document}
+\begin{center}
+\section*{\LARGE \bf Analysis of Spotted  Microarray Data}
+
+\section*{John Maindonald}
+Centre for Mathematics \& its Applications, Australian National University
+\end{center}
+\vspace*{0.5cm}
+
+The example data will be for spotted (two-channel) microarrays.  Exactly
+the same approaches are relevant to spotted oligonucleotides.
+
+\section{Spotted Microarray Methodology \& Tools}
+Each array (``slide'') typically compares expression in genes from one
+``sample'' (type of cell) with expression in genes from another
+``sample''. The common dyes are Cy5 (``red'') and Cy3 (``green'').
+
+Steps in the process of getting microarray intensity measurements are:
+\begin{enumerate}
+\item cDNA samples are obtained by reverse transcription, one for each
+of the two mRNA samples. One sample is labeled with ``red'' dye and
+one with ``green'' dye.
+\item The samples are mixed and hybridized onto the slide.
+\item An image analyser is used to give separate images of the ``red''
+and ``green'' signals. Think of these as much like digital camera 
+images, but with just two frequencies. The resolution may be 15-30
+pixels per spot.
+\item Image analysis software is used to extract various statistical
+summaries of the images of the spots and of their surroundings.  This
+involves:
+\begin{enumerate}
+\item Determination of spot boundaries. 
+\item Determination, for each spot, of ``red'' (R) and ``green'' (G)
+signals. Most software offers a choice of alternative summaries of the spot
+pixel intensities.  Typically an average (mean or median) is taken.
+\item Determination, for each spot, of ``red'' (Rb) and ``green'' (Gb)
+backgrounds.
+\item Determination of one or more quality measures.  These may include:
+spot size, spot shape (round spots are best, if this is what the
+printer was supposed to provide), spot intensity and the range of
+intensity values.
+\end{enumerate}
+\end{enumerate}
+The spots that are of interest are those where is a consistent difference
+between the red and the green signals. It is usual to take either
+log(R)-log(G) or log(R-Rb)-log(G-Gb), apply a correction for dye bias,
+and use this as a measure of differential expression.  This leads to
+a logratio (M) that can be used for further analysis.
+
+Visual checks of the spatial distribution of the separate statistical 
+summaries can be highly revealing.  Below, we will obtain spatial plots
+for each of R (red), Rb (red background), G (green), Gb (green background), 
+M (logratio) and one or more spot quality measures.
+
+\subsection{Scanning and Image Analysis}
+
+The images with which we will work are from an Affymetrix TM 428
+scanner.  Image analysis was performed using the CSIRO Spot image
+analysis software.  There are six ``\textbf{.spot}'' files, one for
+each of six replications of the experiment.  Information about the
+three slides (each with dyeswap repeats) is in the file
+\textbf{coralTargets.txt}.  The file \textbf{dk\_coral-annotated.gal}
+holds identication information about the genes on the slides, and
+about the layout on the slides.  \footnote{\textbf{Note:} Users of
+Axon scanners are likely to work with the accompanying GenePix image
+analysis software. This gives files that have the suffix
+``\textbf{.gpr}''.  Other combinations of scanner and image analysis
+software will yield files that hold broadly equivalent information,
+but formatted and labeled differently. ANU users may encounter the
+combination of Affymetrix TM 428 scanner and Jaguar image analysis
+software that is available at the RSBS Proteomics and Microarray
+facility.  Jaguar places records in the output file in an order that
+is different from that used by Spot and GenePix.}
+
+Here are the contents of the file \textbf{coralTargets.txt}
+\begin{verbatim}
+SlideNumber  FileName      Cy3  Cy5
+        221a coral551.spot post  pre
+        221b coral552.spot  pre post
+        223a coral553.spot post  pre
+        223b coral554.spot  pre post
+        224a coral555.spot post  pre
+        224b coral556.spot  pre post
+\end{verbatim}
+Note that:
+\begin{itemize}
+\item [] \texttt{pre} = pre-settlement, i.e., before the larvae have settled
+\item [] \texttt{post} = post-settlement, i.e., after settlement onto the
+substrate.
+\end{itemize}
+ 
+\subsection{Plotting and Analysis Software}
+
+The \textit{limma} package, written by Dr Gordon Smyth and colleagues
+at WEHI, will be used here. It is reasonably straightforward to use,
+does a good job of initial data exploration, and offers state of the
+art abilities for analysis of differential expression.
+
+Additionally, three functions from the \textit{DAAGbio} package will
+be used.
+
+\section{Getting Started}
+
+For a new project, a good first step is to start a new textit{working
+  directory}, to be used for that project.  Files that hold data that
+are to be analysed will be copied to that directory,
+and output files will by default go there.
+
+As a minimum, copy the following files to your working
+directory: \textbf{coral551.spot}, \textbf{coral552.spot},
+\textbf{coral553.spot}, \textbf{coral554.spot},
+\textbf{coral555.spot}, \textbf{coral556.spot}, files
+\textbf{coralTargets.txt}, \textbf{SpotTypes.txt} and
+\textbf{dk\_coral-annotated.gal}.  It will also be a good idea to copy
+across the script file \textbf{marray-notes.R}, which holds the R
+scripts.
+
+
+\subsection*{Attaching the \textit{limma} package}
+
+Start an R session.  From the command line, type
+<<load-limma, echo=t, eval=t>>=
+library(limma)
+@ 
+
+\paragraph{Help for \texttt{limma}}
+
+Type \texttt{help.start()}.  After some time a browser window should
+open.  You might want to take a brief look at the User's Guide for
+\textit{limma}.  Click on \underline{Packages}, then on
+\underline{limma}, then on \underline{Overview}, then on
+\underline{LIMMA User's Guide (pdf)}
+
+\subsection{Reading Data into R}
+
+As a first step, read into R the information about the half-slides, from
+the file \textbf{coralTargets.txt}.  Here is
+how:\footnote{\textbf{Note:} The above assumes that tabs have been
+used as separators, when the file \textbf{coralTargets.txt} was
+created.  I have created a second targets file --
+\textbf{coralTargsp.txt}, in which the separators are spaces.  For
+this, enter:\\ 
+\texttt{targets <- readTargets("coralTargsp.txt", sep="")}}
+<<readTargets, echo=t, eval=t, results=hide>>=
+targets <- readTargets("coralTargets.txt")
+targets$FileName     # Display the file names
+@ 
+The first command gets the targets information. 
+The names of the files are stored in the \texttt{FileName} column.\footnote{
+\begin{BVerbatim}[baseline=t]
+## Another way to get the file names is to enter 
+fnames <- dir(pattern="\\.spot")
+ # Finds all files whose names end in ".spot''
+\end{BVerbatim}
+}
+To see the complete information that has been input:
+\texttt{targets}, type:
+<<see-targets, echo=t, eval=f>>=
+targets
+@ 
+
+Next, the function \texttt{read.maimages()} (from the \textit{limma}
+package) will be used to read in the data.  This function puts all the
+information from the separate files into a single data structure, here
+called \texttt{coralRG}. Use of a name that has the final \texttt{RG}
+is not compulsory, but serves as a useful reminder that the structure
+has information on the red signal and red background (\texttt{R} and
+\texttt{Rb}), and on the green signal and green background (\texttt{G}
+and \texttt{Gb}).
+<<read-images, echo=t, eval=t, results=hide>>=
+coralRG <- read.maimages(targets$FileName, source = "spot",
+    other.columns=list(area="area", badspot="badspot"))
+@ 
+The \texttt{other.columns} information is an optional extra,
+which it is however useful to use to read in quality measures.
+
+Various summary information can be obtained for the different half-slides and
+measures.  Foe example:
+<<echo=t, eval=t, results=hide>>=
+summary(coralRG$other$area)
+@
+However these may not mean much, until you have been working with
+microarray data for a while.  Graphs are in general more helpful.
+For example, here is a graph that will help in judging the extent to
+which spots are close to the expected 100 units of area.
+<<echo=t, eval=t>>=
+plot(density(coralRG$other$area[,1]))
+@ 
+The \textit{limma} package does actually allow for the use of area
+as a measure of quality, with information from spots that are larger
+or smaller than the optimum given a reduced weight in the analysis.
+
+\subsubsection*{Sequence annotation and related information}
+
+Next, additional information will be tagged on to the \texttt{coralRG}
+structure, first gene annotation information that is read from the
+\textbf{.gal} file, and then information on the way that the
+half-slides were printed that can be deduced from the gene annotation file.
+<<echo=t, eval=t, results=hide>>=
+coralRG$genes <- readGAL()
+coralRG$printer <- getLayout(coralRG$genes)
+coralRG$printer
+@ 
+These half slides were printed in a 4 by 4 layout, corresponding to the
+4 by 4 layout of the printhead.  Each tip printed an array of 16 rows
+by 12 columns.  To see the order in which the spots were printed,
+attach the \textit{DAAGbio} package, and run the function 
+\texttt{plotprintseq()}, thus:
+and enter:
+<<printseq>>=
+library(DAAGbio)
+plotprintseq()
+@ 
+
+
+\subsubsection*{The Spot Types File}
+This is optional, but strongly recommended.  Spots can be grouped into
+at least four categories -- there are ``genes'' (really, partial gene
+sequences), negative controls, blanks and differentially expressed
+controls.  Genes may or may not be differentially expressed, the next
+three categories should not show evidence of differential expression,
+and the differentially expressed controls should mostly show evidence
+of differential expression.  Plots that label points according to
+their types can be beautiful, insightful and, if they find nothing
+amiss, reassuring.
+
+Here is what the file looks like (note that tabs must be 
+used as separators, for the code below to work without modification):
+\begin{verbatim}
+SpotType        ID      Name    Color
+gene            *       *       black
+negative        *       [1-9]*  brown
+blank           *       -       yellow
+diff-exp ctl    *       DH*     blue
+\end{verbatim}
+{\noindent \small Any color in the long list given by the function
+\texttt{colors()} is acceptable.  Try for example \texttt{royalblue}
+or \texttt{hotpink} for calibration spots.  They are much less
+effective.  You could use \texttt{coral} in place of \texttt{black}
+for the ``gene''!!}
+
+The following extracts the spot type information from the file,
+and appends it to the data structure that I have called 
+\texttt{coralRG}:
+<<echo=t, eval=t>>=
+spottypes<-readSpotTypes()
+coralRG$genes$Status <- controlStatus(spottypes, coralRG)
+@ 
+
+\section{Plots}
+
+\subsection{Spatial Plots}
+These plots use colour scales to summarize, on a layout that reflects
+the actual layout of the slide, information on the spots.  The idea is
+to check for any strong spatial patterns that might indicate some lack
+of uniformity that has resulted from the printing (e.g., one print tip
+printing differently from the others), or from uneven conditions in
+the hybridization chamber.  There may be surface features, perhaps due
+to a hair or to the mishandling of one corner of the slide, this may
+show up on the plot.
+
+What is finally important is of course the effect on the log-ratios
+(the M-values).  Some unevenness in the separate foreground and
+background intensities can be tolerated, providing that it leads to
+much the same proportional change in both channels.
+
+There are two possibilities -- to use \texttt{imageplot()} from
+\textit{limma}, or to use my function \texttt{imgplot()} that is
+included in the \textit{DAAGbio} package; see the appendux.  Here are
+plots that use \texttt{imageplot()}:
+<<echo=t, eval=t>>=
+imageplot(log2(coralRG$Rb[, 1]+1), layout = coralRG$printer,
+          low="white", high="red")
+@ 
+This should be repeated for each different half-slide, for both red and
+green, and similarly for the green background.  To get the plot for the
+second half-slide, type:
+<<echo=t, eval=t>>=
+imageplot(log2(coralRG$Rb[, 2]+1), layout = coralRG$printer,
+          low="white", high="red")
+@ 
+
+The plots can be obtained all six at once, in a three rows by two
+columns layout.  For this, use the function \texttt{xplot()},
+included in the \textit{DAAGbio} package.
+
+As an example, to get the six plots for the red channel on the screen, type:
+\begin{verbatim}
+x11(width=7.5, height=11)
+xplot(data = coralRG$R, layout = coralRG$printer, FUN=imageplot)
+\end{verbatim}
+(Under Macintosh OSX with the Aqua GUI, specify
+\texttt{quartz(width=7.5, height=11)} to use the quartz device.
+It is also possible to send the output to a hard copy.  Type, e.g.:
+\begin{verbatim}
+quartz(width=7.5, height=11)
+xplot(data = coralRG$R, layout = coralRG$printer, FUN=imageplot,
+       device=pdf)
+\end{verbatim}
+Other possibilities for \texttt{device} are \texttt{device="ps"},
+\texttt{device="png"}, \texttt{device="jpeg"} and
+\texttt{device="bmp"}.  For \texttt{device="png"} and
+\texttt{device="jpeg"} the parameters \texttt{width} and
+\texttt{height} will need to be specified, in pixels, in the call to
+\texttt{sixplot()}.
+
+\subsection{MA plots \& Normalization}
+In this overview, the default background correction will be used, in
+which the background is in each case subtracted from the corresponding
+measured signal.\footnote{For image files from Spot, this usually
+works fairly well.  GenePix gives image files in which the intensities
+can be much too high.  There are alternative to subtracting off the
+background that may be desirable, perhaps ignoring it altogether.}
+
+At this point normalization is an issue.  The Cy3 channel (``green'')
+typically shows up with higher intensity than the Cy5 channel
+(``red'').  The measure of differential expression is\[ 
+{\rm M} = \log({\rm red intensity}) - \log({\rm green intensity}) =
+\log(\frac{\displaystyle \rm red intensity}
+{\displaystyle \rm green intensity})
+\]
+
+First, check what happens if we do not normalize.
+Try the following:
+<<echo=t, eval=t>>=
+plotMA(coralRG, array=1)
+@ 
+This plots the unnormalized log-ratios (the M-values) against the
+the averages of the log-intensities for the two separate channels,
+i.e., against what are called the A-values.
+
+To see all six arrays in a single plot, precede the six plots
+(first with \texttt{array=1}, then \texttt{array=1}, \ldots)
+with:
+\begin{verbatim}
+oldpar <- par(mfrow=c(3,2), mar=c(5.1, 4.1, 1.1, 0.6))
+## When done with the 3 by 2 layout, be sure to type
+par(oldpar)     # This returns to the original settings.
+\end{verbatim}
+In some of the plots, the dye bias is rather strongly density dependent.
+
+It is also possible to do the following:
+<<echo=t, eval=t>>=
+rawMA <- normalizeWithinArrays(coralRG, method = "none")
+plotPrintTipLoess(rawMA, array=1)
+@ 
+A different curve is fitted for each of the print tip groups.
+There does seem to be some difference in dye bias between the
+different print tip groups.
+
+Next, we apply print tip loess normalization, and check the MA plots:
+<<echo=t, eval=t>>=
+MA <- normalizeWithinArrays(coralRG, method = "printtiploess")
+plotPrintTipLoess(MA)
+@ 
+Next, we check whether normalization seems required between arrays:
+<<echo=t, eval=f>>=
+boxplot(MA$M ~ col(MA$M), names = colnames(MA$M))
+@ 
+(If you do not understand boxplots, there is a good explanation at:
+\url{http://davidmlane.com/hyperstat/A38393.html})
+
+As the arrays seem to have different spreads of M-values, we scale
+normalize between arrays, and repeat the boxplot:
+<<echo=t, eval=t>>=
+nMA <- normalizeBetweenArrays(MA)
+boxplot(nMA$M ~ col(nMA$M), names = colnames(nMA$M))
+@ 
+The scaling ensures that the medians, and the upper and lower quartiles,
+agree across the different slides.
+
+\subsubsection*{Checks on the Differentially Expressed Controls}
+
+The differentially expressed controls ought to show similar evidence of
+differential expression on all sets of results. Do they?
+
+We extract the M-values for the differentially expressed controls
+from the total data.
+<<echo=t, eval=t>>=
+wanted <- coralRG$genes$Status == "diff-exp ctl"
+rawdeM <- rawMA$M[wanted, ]
+pairs(rawdeM)
+@ 
+The differentially expresed controls line up remarkably well 
+across the different half-slides.  Notice that half-slide 5 is the odd
+one out.  (Why is the correlation sometimes positive and
+sometimes negative? What is the pattern?)
+
+We now repeat this exercise with the normalized data: 
+<<echo=t, eval=t>>=
+wanted <- coralRG$genes$Status == "diff-exp ctl"
+deM <- nMA$M[wanted, ]
+pairs(rawdeM)
+@ Half-slide 5 is still a maverick.  The differentially expressed
+controls from the other half-slides line up beautifully.\newline [Dear
+me! Every family of more than two or three has a misfit.  We'll banish
+half-slide 5 from our assemblage, at least until we can think of
+something better to do with it.]
+
+\subsubsection*{More plots}
+Use \texttt{imageplot()} with the M-values on all these half-slides, and look
+especially at half-slide 5, thus:
+<<echo=t, eval=t>>=
+imageplot(nMA$M[,5], layout=coralRG$printer)
+@ 
+Something bad clearly happened to the left side of this half-slide!
+
+\section{Tests for Differential Expression}
+We fit a simple statistical model that allows for the possible
+effect of the dye swap, and which we can use as the basis for
+checks for differential expression.  
+Recall that ${\rm M} = \log({\rm red intensity}) - \log({\rm green intensity})$.
+Here is how this connects with treatments:
+\vspace*{3pt}
+
+\begin{tabular}{lcccccc}
+Slide & 221a & 221b & 223a & 223b & 224a & 224b \\
+\hline
+ & $\log({\rm pre/post)}$ & $\log({\rm post/pre)}$
+ & $\log({\rm pre/post)}$ & $\log({\rm post/pre)}$
+ & $\log({\rm pre/post)}$ & $\log({\rm post/pre)}$ \\
+Xply by & -1 & 1 &  -1 & 1 &  0 & 1 \\
+\hline
+\end{tabular}
+\vspace*{3pt}
+
+Results for the first and third half-slide are multiplied by -1,
+so that $\log({\rm pre/post)}$ (which equals 
+$\log({\rm pre}) - \log({\rm post)}$ becomes $\log({\rm post/pre)}$.
+The 0 for the fifth half-slide will omit it altogether.
+This is achieved by placing these numbers into a ``design vector''.
+<<echo=t, eval=t>>=
+design <- c(-1, 1, -1, 1, 0, 1)
+@ 
+
+\subsubsection*{Fitting the statistical model}
+To fit a model that reflects this design, specify:
+<<echo=t, eval=t>>=
+fit <- lmFit(nMA, design)
+@ 
+This basically gives $t$-test results for all the different spots.
+Any attempt at interpretation has to take account of the large number
+of tests that have been performed.  Also, because there are just 5
+sets of usable M-values, the variances that are used in the
+denominators of the $t$-statistics, and hence the $t$-statistics
+themselves, are more unstable than is desirable.  
+
+The calculations that now follow take us into much more speculative
+territory, where different software uses different approaches.
+My view is that the calculations that are demonstrated are close
+to the best that are at present available:  They do three things:
+\begin{itemize}
+\item They use information from the variances for all spots,
+combining this with the spot-specific information, to get
+more stable $t$-statistics.
+\item They make an adjustment for the multiplicity of tests,
+leading to adjusted $t$-statistics that can pretty much be
+compared with the usual one-sample $t$-critical values.\newline
+[There are many ways to do this.  Also the function requires
+a prior estimate of the proportion of genes that are differentially
+expressed, by default set to 0.01, i.e.\ there is a large element
+of subjective judgment.]
+\item For each gene they give an odds ratio ($B$ = Bayes factor) that
+      it is differentially expressed.  [This relies on the same prior
+      estimate of the proportion of genes that are differentially
+      expressed.]
+\end{itemize}
+
+From the fit object, we calculate empirical Bayes moderated 
+$t$-statistics and do a qq-plot:
+<<echo=t, eval=t>>=
+efit <- eBayes(fit)
+qqt(efit$t, df = efit$df.prior + efit$df.residual, pch = 16, 
+    cex = 0.2)
+@ The majority of genes lie on a line that goes through the centre of
+the plot.  Those that lie off this (below it on the left, or above it
+on the right) are most likely to be differentially expressed.
+\footnote{If the results from the different genes were independent,
+the line on which most of the ``genes'' lie would be a 45$^\circ$
+line, with a slope of 1.0.  If you wish, type \texttt{abline(0, 1,
+col="red")} to put in such a line anyway. The line on which most of
+the genes lie has a much steeper slope than this 45$^\circ$ line.}
+
+Next we print out a table that shows the top 50 differentially
+expressed genes, in order of the moderated $t$-statistic values:
+<<echo=t, eval=t, results=hide>>=
+options(digits = 3)
+topvals <- topTable(efit, number = 50)
+topvals
+@ 
+We store the results in \texttt{topvals} prior to displaying them,
+as they will be used later.  Notice that an adjusted $p$-value of 0.05
+corresponds to a $B$-statistic of about 3.6.  This may be a reasonably
+cut-off point.
+
+The order of genes on the list is much more secure than the $B$-values
+and $P$-values.  The extent to which the statistics are affected by the
+prior probability will be demonstrated in the exercise below.  
+
+Here is another type of plot:
+<<echo=t, eval=t>>=
+plot(efit$coef, efit$lods, pch = 16, cex = 0.2, xlab = "log(fold change)", 
+    ylab = "log(odds)")
+ord <- order(efit$lods, decreasing = TRUE)
+top8 <- ord[1:8]
+text(efit$coef[top8], efit$lods[top8], labels = coralRG$genes[top8, 
+    "Name"], cex = 0.8, col = "blue")
+@ 
+
+\paragraph{Exercise:} Change the prior probability to 0.02, i.e.
+\begin{verbatim}
+efit.02 <- eBayes(fit, prop=0.02)
+topTable(efit.02, number = 50)
+\end{verbatim}
+Observe what difference this makes to the list.  Try also \texttt{prob=0.1}.
+A good way to see the effect is to plot the \texttt{P.Value} or \texttt{B}
+from the separate fits, one against the other:
+\begin{verbatim}
+efit.1 <- eBayes(fit, prop=0.1)
+B.1 <- topTable(efit.1, number = 3072)$B
+B.01 <- topvals$B
+points(B.01, B.1, col="gray")
+\end{verbatim}
+
+Do the equivalent plots for \texttt{P.Value}.
+
+\section{More refined analyses}
+\subsection{Reading Data into R, with weight information incorporated}
+
+Read the data in, with weighting information included:
+<<echo=t, eval=t, results=hide>>=
+coral2RG <- read.maimages(targets$FileName, 
+                         source = "spot",
+                         wt.fun=wtarea(100))
+coral2RG$genes <- readGAL()
+coral2RG$printer <- getLayout(coral2RG$genes)
+@ 
+The weights will be used automatically by functions that operate
+on \texttt{coral2RG}.
+
+\subsection{MA plots \& Normalization}
+Apply print tip loess normalization, and check the MA plots:
+<<echo=t, eval=t>>=
+MA2 <- normalizeWithinArrays(coral2RG, method = "printtiploess")
+plotPrintTipLoess(MA2)
+@ Next, we check whether normalization seems required between arrays,
+then scale normalize between arrays, and repeat the boxplot:
+<<echo=t, eval=t>>=
+boxplot(MA2$M ~ col(MA2$M), names = colnames(MA2$M))
+nMA2 <- normalizeBetweenArrays(MA2)
+boxplot(nMA2$M ~ col(nMA2$M), names = colnames(nMA2$M))
+@ 
+
+\subsubsection*{Slide 5, again!}
+Use \texttt{imageplot()} with the M-values on all these half-slides, and look
+especially at half-slide 5, thus:
+<<echo=t, eval=t>>=
+imageplot(nMA2$M[,5], layout=coral2RG$printer)
+@ 
+Use of the quality information has not made much difference to this plot:
+
+\subsubsection*{Fitting the statistical model}
+To fit a model that reflects this design, specify:
+<<echo=t, eval=t>>=
+design <- c(-1, 1, -1, 1, 0, 1)
+fit2 <- lmFit(nMA2, design)
+@ 
+
+From the fit object, we calculate empirical Bayes moderated 
+$t$-statistics and do a qq-plot:
+<<echo=t, eval=t>>=
+efit2 <- eBayes(fit2)
+qqt(efit2$t, df = efit2$df.prior + efit2$df.residual, pch = 16, 
+    cex = 0.2)
+@ 
+
+Next we print out a table that shows the top 50 differentially
+expressed genes, in order of the moderated $t$-statistic values:
+<<echo=t, eval=t, results=hide>>=
+options(digits = 3)
+topTable(efit2, number = 50)
+@ 
+
+Now see what different the use of weights has made to the list
+(the vector \texttt{topvals} was found earlier):
+<<echo=t, eval=t, results=hide>>=
+## Get & store results with & without weights
+topvals2 <- topTable(efit2, number = 50)
+cbind(row.names(topvals), row.names(topvals2))
+@
+Now check how many of the genes are in common across both lists:
+<<echo=t, eval=t, results=hide>>=
+sum(row.names(topvals)%in%row.names(topvals2))
+@  
+\section*{Appendix}
+
+\subsection*{Installation of the R software}
+First install R (2.4.0 or later).  (Versions are available for Unix,
+Linux, Windows and Macintosh OS X.)
+
+Install the \textit{limma} and \textit{DAAGbio} packages.
+This can be done from an R session\\
+EITHER click the \underline{Packages} menu item, then on 
+\underline{Install Package(s) from local zip files...}, etc.\newline
+OR click the \underline{Packages} menu item, then on 
+\underline{Install Package(s) from Bioconductor}, etc.\newline
+[On the Mac OS X Aqua GUI for R, click on \underline{Packages \& Data}, then 
+\underline{Package Installer}, set the repository to 
+\underline{BioConductor (binaries)}, click on \underline{Get List}, etc.]\\
+
+For installation from the command line, see the Bioconductor site
+(\url{http://www.bioconductor.org/}) for instructions.
+
+
+\subsection{\texttt{imgplot()} as an alternative to 
+\texttt{imageplot()}}
+
+The function \texttt{imgplot()} gives a display that is a bit
+different from \texttt{imageplot()}. Try:
+<<echo=t, eval=t>>=
+imgplot(coralRG$R[, 1], layout = coralRG$printer)
+@
+By default, this shows just the smallest 5\% of intensities and the
+largest 5\% of intensities.
+ 
+Use these to look for parts of the half-slide that all show a
+consistent difference from the rest of the half-slide.
+Remember however that what is important is the pattern 
+that appears after background correction (if any),
+normalization and the calculation of the M-values.
+
+
+\subsection*{How was this document produced}
+The document \textbf{marray-wkshp05.Rnw} can be copied into the
+working directory.  Then from within an R session, enter:
+\begin{verbatim}
+library(tools)
+Sweave("marray-notes.Rnw")
+\end{verbatim}
+This produces a \LaTeX\ document that can then be processed through the
+\LaTeX\ document preparation system to give a postscript or pdf file.
+
+This is a great way to document your eventual analyses.  Changes to
+the code in the \textbf{.Rnw} document are automatically reflected
+in the \LaTeX\ document that comes from \texttt{Sweave()}.
+See \texttt{help(Sweave)} for information on documentation.
+
+\subsection*{References}
+\begin{itemize}
+\item[] Smythe, G., Thorne, T., and Wettenhall, J. 2004. limma: Linear
+Models for Microarray Data User's Guide.  This document is included
+with \textit{limma} distributions.
+\item[] Beare, R.\ and Buckley, M. 2004. Spot:cDNA Microarray Image
+Analysis Users Guide.  
+Available from \url{http://spot.cmis.csiro.au/spot/spotmanual.php}.
+\end{itemize}
+
+\subsection*{Acknowledgements}
+Many thanks to Gaby Samuels, Eldon Ball, David Hayward and Rob Saint
+(Centre for Molecular Genetics of Development) for permission to use
+the coral data for this workshop.  The associated research was
+supported by ARC grants DP0343727 (John Maindonald), S4116004
+(Lauretta Grasso, Gaby Samuels, Eldon Ball, David Hayward and Rob
+Saint, through CMGD).  Conrad Burden did a marvelous job of checking
+these notes for mistakes.
+\end{document}
