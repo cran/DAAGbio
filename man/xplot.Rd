@@ -61,7 +61,7 @@ function(data = coralRG$R, images=1:6, layout = coralRG$printer, mfrow=c(3,2),
       FUN(data[,i], layout=layout)
       mtext(side=3,line=paneltitles.line,paneltitles[i],adj=0)
     }
-    mtext(side=3, line=0.25, title, outer=T)
+    mtext(side=3, line=0.25, title, outer=TRUE)
     if(!is.null(device))dev.off()
   }
 }

@@ -27,7 +27,7 @@ function (z=coralRG$R[,1], layout=coralRG$printer, crit1 = 0.05,
       tmp <- !(is.na(z) | is.infinite(z))
       length(z[tmp], ...)
     }
-    if(is.matrix(z))warning("z is a matrix, You probably want a column vector")
+  if(is.matrix(z))warning("z is a matrix, You probably want a column vector")
   bplot <- function(z, boxplot.side=1){
     xrange <- range(z,na.rm=TRUE)
     iqr <- diff(quantile(xrange, c(.25,.75)))
@@ -41,7 +41,7 @@ function (z=coralRG$R[,1], layout=coralRG$printer, crit1 = 0.05,
     atvert <- switch(boxplot.side, par()$usr[3]-par()$cxy[2]*0.8,
                      "", par()$usr[4]+par()$cxy[2]*0.8, "")
     if(atvert!=""){
-      boxplot(z, at=atvert, boxwex=bwex, add=T, horizontal=T, xaxt="n")
+      boxplot(z, at=atvert, boxwex=bwex, add=TRUE, horizontal=TRUE, xaxt="n")
       axis(side=boxplot.side, line=1.5,
            at=newpos, labels=xpos, cex.axis=0.75, mgp=c(2, 0.5, 0))
     }
@@ -69,9 +69,9 @@ function (z=coralRG$R[,1], layout=coralRG$printer, crit1 = 0.05,
     quiles2[2:nhalf] <- quiles2[1]-(quiles2[nhalf+1]-quiles2[1])*
       ((nhalf-1):1)/nhalf
     plo[-1] <- sapply(quiles1[-1],
-                      function(x, z)sum(z<=x, na.rm=T)/length.na(z), z=z)
+                      function(x, z)sum(z<=x, na.rm=TRUE)/length.na(z), z=z)
     phi[-1] <- sapply(quiles2[-1],
-                      function(x, z)sum(z<=x, na.rm=T)/length.na(z), z=z)
+                      function(x, z)sum(z<=x, na.rm=TRUE)/length.na(z), z=z)
   }
   
   if(crit1+crit2<1){
@@ -146,7 +146,7 @@ function (z=coralRG$R[,1], layout=coralRG$printer, crit1 = 0.05,
       nlast <- length(yvals2)
       nclast <- length(colpal)
       rect(x0, yvals2[nlast], x0+barwid, yvals2[nlast]+eps2,
-           col=colpal[nclast], xpd=T)
+           col=colpal[nclast], xpd=TRUE)
       text(x0+0.5*barwid, yvals2[nlast]+0.5*eps2, "NA",
            xpd=TRUE, srt=srt)
       yvals2 <- yvals2[-((nlast-1):nlast)]
@@ -154,7 +154,7 @@ function (z=coralRG$R[,1], layout=coralRG$printer, crit1 = 0.05,
     }
     if(!midbreak){
       rect(x0, yvals2, x0+barwid, yvals2+eps2,
-           col=colpal, xpd=T)
+           col=colpal, xpd=TRUE)
       text(xcutpos, c(yvals2[1],yvals2+eps2),
            paste(signif(quiles,3)), srt=srt, xpd=TRUE, cex=0.8)
       text(xquilepos, yvals2[1], "(0%)", srt=srt, xpd=TRUE, cex=0.65)
@@ -167,10 +167,10 @@ function (z=coralRG$R[,1], layout=coralRG$printer, crit1 = 0.05,
       
     }
     else {rect(x0, yvals2[1:nhalf], x0+barwid, yvals2[1:nhalf]+eps2,
-               col=colpal[1:nhalf], xpd=T)
+               col=colpal[1:nhalf], xpd=TRUE)
           rect(x0, yvals2[(nhalf+2):(2*nhalf+1)], x0+barwid,
                yvals2[(nhalf+2):(2*nhalf+1)]+eps2,
-               col=colpal[(nhalf+2):(2*nhalf+1)], xpd=T)
+               col=colpal[(nhalf+2):(2*nhalf+1)], xpd=TRUE)
           text(xcutpos, yvals2[1:(nhalf+1)],
                paste(signif(quiles1,3)), srt=srt, xpd=TRUE, cex=0.8)
           text(xquilepos, yvals2[2:(nhalf+1)],
