@@ -23,7 +23,6 @@ down each column in a grid}
   \item{delay1}{Delay in shifting by one spot}
   \item{delay2}{Delay in shifting to new column or new row}
 }
-\seealso{ ~~objects to See Also as \code{\link{help}}, ~~~ }
 \examples{
 plotprintseq()
 

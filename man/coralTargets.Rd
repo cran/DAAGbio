@@ -4,7 +4,7 @@
 \title{Targets file to accompany spotted expression array data}
 \description{
   Targets file, in the form expected by limma, to accompany the
-  expression array data in \texttt{coralRg}
+  expression array data in \code{coralRg}
 }
 \usage{data(coralTargets)}
 \format{
