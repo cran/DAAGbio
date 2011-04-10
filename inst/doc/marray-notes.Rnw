@@ -126,11 +126,20 @@ directory: \textbf{coral551.spot}, \textbf{coral552.spot},
 across the script file \textbf{marray-notes.R}, which holds the R
 scripts.
 
+\paragraph{Note:} As of version 0.6 of \textit{DAAGbio}, the six
+``\textbf{.spot}'' files \textbf{coral551.spot}, \ldots,
+\textbf{coral556.spot} are stored in a compressed format, reducing
+them to a little over 40\% of their original size. They have been
+created by typing, on a Unix or Unix-like command line:\\
+\textbf{\em gzip -9 coral55?.spot}\\
+They were then renamed back to \textbf{\em *.spot}. The R file-reading
+abilities that are used by \texttt{read.maimages()} are, from R
+version 2.10.0 and onwards, able to process such files.
 
 \subsection*{Attaching the \textit{limma} package}
 
 Start an R session.  From the command line, type
-<<load-limma, echo=t, eval=t>>=
+<<load-limma, echo=TRUE, eval=TRUE>>=
 library(limma)
 @ 
 
@@ -152,7 +161,7 @@ created.  I have created a second targets file --
 \textbf{coralTargsp.txt}, in which the separators are spaces.  For
 this, enter:\\ 
 \texttt{targets <- readTargets("coralTargsp.txt", sep="")}}
-<<readTargets, echo=t, eval=t, results=hide>>=
+<<readTargets, echo=TRUE, eval=TRUE, results=hide>>=
 targets <- readTargets("coralTargets.txt")
 targets$FileName     # Display the file names
 @ 
@@ -166,7 +175,7 @@ fnames <- dir(pattern="\\.spot")
 }
 To see the complete information that has been input:
 \texttt{targets}, type:
-<<see-targets, echo=t, eval=f>>=
+<<see-targets, echo=TRUE, eval=FALSE>>=
 targets
 @ 
 
@@ -178,7 +187,7 @@ is not compulsory, but serves as a useful reminder that the structure
 has information on the red signal and red background (\texttt{R} and
 \texttt{Rb}), and on the green signal and green background (\texttt{G}
 and \texttt{Gb}).
-<<read-images, echo=t, eval=t, results=hide>>=
+<<read-images, echo=TRUE, eval=TRUE, results=hide>>=
 coralRG <- read.maimages(targets$FileName, source = "spot",
     other.columns=list(area="area", badspot="badspot"))
 @ 
@@ -187,14 +196,14 @@ which it is however useful to use to read in quality measures.
 
 Various summary information can be obtained for the different half-slides and
 measures.  Foe example:
-<<echo=t, eval=t, results=hide>>=
+<<echo=TRUE, eval=TRUE, results=hide>>=
 summary(coralRG$other$area)
 @
 However these may not mean much, until you have been working with
 microarray data for a while.  Graphs are in general more helpful.
 For example, here is a graph that will help in judging the extent to
 which spots are close to the expected 100 units of area.
-<<echo=t, eval=t>>=
+<<echo=TRUE, eval=TRUE>>=
 plot(density(coralRG$other$area[,1]))
 @ 
 The \textit{limma} package does actually allow for the use of area
@@ -207,7 +216,7 @@ Next, additional information will be tagged on to the \texttt{coralRG}
 structure, first gene annotation information that is read from the
 \textbf{.gal} file, and then information on the way that the
 half-slides were printed that can be deduced from the gene annotation file.
-<<echo=t, eval=t, results=hide>>=
+<<echo=TRUE, eval=TRUE, results=hide>>=
 coralRG$genes <- readGAL()
 coralRG$printer <- getLayout(coralRG$genes)
 coralRG$printer
@@ -253,7 +262,7 @@ for the ``gene''!!}
 The following extracts the spot type information from the file,
 and appends it to the data structure that I have called 
 \texttt{coralRG}:
-<<echo=t, eval=t>>=
+<<echo=TRUE, eval=TRUE>>=
 spottypes<-readSpotTypes()
 coralRG$genes$Status <- controlStatus(spottypes, coralRG)
 @ 
@@ -279,14 +288,14 @@ There are two possibilities -- to use \texttt{imageplot()} from
 \textit{limma}, or to use my function \texttt{imgplot()} that is
 included in the \textit{DAAGbio} package; see the appendux.  Here are
 plots that use \texttt{imageplot()}:
-<<echo=t, eval=t>>=
+<<echo=TRUE, eval=TRUE>>=
 imageplot(log2(coralRG$Rb[, 1]+1), layout = coralRG$printer,
           low="white", high="red")
 @ 
 This should be repeated for each different half-slide, for both red and
 green, and similarly for the green background.  To get the plot for the
 second half-slide, type:
-<<echo=t, eval=t>>=
+<<echo=TRUE, eval=TRUE>>=
 imageplot(log2(coralRG$Rb[, 2]+1), layout = coralRG$printer,
           low="white", high="red")
 @ 
@@ -333,7 +342,7 @@ typically shows up with higher intensity than the Cy5 channel
 
 First, check what happens if we do not normalize.
 Try the following:
-<<echo=t, eval=t>>=
+<<echo=TRUE, eval=TRUE>>=
 plotMA(coralRG, array=1)
 @ 
 This plots the unnormalized log-ratios (the M-values) against the
@@ -351,7 +360,7 @@ par(oldpar)     # This returns to the original settings.
 In some of the plots, the dye bias is rather strongly density dependent.
 
 It is also possible to do the following:
-<<echo=t, eval=t>>=
+<<echo=TRUE, eval=TRUE>>=
 rawMA <- normalizeWithinArrays(coralRG, method = "none")
 plotPrintTipLoess(rawMA, array=1)
 @ 
@@ -360,12 +369,12 @@ There does seem to be some difference in dye bias between the
 different print tip groups.
 
 Next, we apply print tip loess normalization, and check the MA plots:
-<<echo=t, eval=t>>=
+<<echo=TRUE, eval=TRUE>>=
 MA <- normalizeWithinArrays(coralRG, method = "printtiploess")
 plotPrintTipLoess(MA)
 @ 
 Next, we check whether normalization seems required between arrays:
-<<echo=t, eval=f>>=
+<<echo=TRUE, eval=FALSE>>=
 boxplot(MA$M ~ col(MA$M), names = colnames(MA$M))
 @ 
 (If you do not understand boxplots, there is a good explanation at:
@@ -373,7 +382,7 @@ boxplot(MA$M ~ col(MA$M), names = colnames(MA$M))
 
 As the arrays seem to have different spreads of M-values, we scale
 normalize between arrays, and repeat the boxplot:
-<<echo=t, eval=t>>=
+<<echo=TRUE, eval=TRUE>>=
 nMA <- normalizeBetweenArrays(MA)
 boxplot(nMA$M ~ col(nMA$M), names = colnames(nMA$M))
 @ 
@@ -387,7 +396,7 @@ differential expression on all sets of results. Do they?
 
 We extract the M-values for the differentially expressed controls
 from the total data.
-<<echo=t, eval=t>>=
+<<echo=TRUE, eval=TRUE>>=
 wanted <- coralRG$genes$Status == "diff-exp ctl"
 rawdeM <- rawMA$M[wanted, ]
 pairs(rawdeM)
@@ -398,7 +407,7 @@ one out.  (Why is the correlation sometimes positive and
 sometimes negative? What is the pattern?)
 
 We now repeat this exercise with the normalized data: 
-<<echo=t, eval=t>>=
+<<echo=TRUE, eval=TRUE>>=
 wanted <- coralRG$genes$Status == "diff-exp ctl"
 deM <- nMA$M[wanted, ]
 pairs(rawdeM)
@@ -411,7 +420,7 @@ something better to do with it.]
 \subsubsection*{More plots}
 Use \texttt{imageplot()} with the M-values on all these half-slides, and look
 especially at half-slide 5, thus:
-<<echo=t, eval=t>>=
+<<echo=TRUE, eval=TRUE>>=
 imageplot(nMA$M[,5], layout=coralRG$printer)
 @ 
 Something bad clearly happened to the left side of this half-slide!
@@ -440,13 +449,13 @@ so that $\log({\rm pre/post)}$ (which equals
 $\log({\rm pre}) - \log({\rm post)}$ becomes $\log({\rm post/pre)}$.
 The 0 for the fifth half-slide will omit it altogether.
 This is achieved by placing these numbers into a ``design vector''.
-<<echo=t, eval=t>>=
+<<echo=TRUE, eval=TRUE>>=
 design <- c(-1, 1, -1, 1, 0, 1)
 @ 
 
 \subsubsection*{Fitting the statistical model}
 To fit a model that reflects this design, specify:
-<<echo=t, eval=t>>=
+<<echo=TRUE, eval=TRUE>>=
 fit <- lmFit(nMA, design)
 @ 
 This basically gives $t$-test results for all the different spots.
@@ -479,7 +488,7 @@ of subjective judgment.]
 
 From the fit object, we calculate empirical Bayes moderated 
 $t$-statistics and do a qq-plot:
-<<echo=t, eval=t>>=
+<<echo=TRUE, eval=TRUE>>=
 efit <- eBayes(fit)
 qqt(efit$t, df = efit$df.prior + efit$df.residual, pch = 16, 
     cex = 0.2)
@@ -494,7 +503,7 @@ the genes lie has a much steeper slope than this 45$^\circ$ line.}
 
 Next we print out a table that shows the top 50 differentially
 expressed genes, in order of the moderated $t$-statistic values:
-<<echo=t, eval=t, results=hide>>=
+<<echo=TRUE, eval=TRUE, results=hide>>=
 options(digits = 3)
 topvals <- topTable(efit, number = 50)
 topvals
@@ -509,7 +518,7 @@ and $P$-values.  The extent to which the statistics are affected by the
 prior probability will be demonstrated in the exercise below.  
 
 Here is another type of plot:
-<<echo=t, eval=t>>=
+<<echo=TRUE, eval=TRUE>>=
 plot(efit$coef, efit$lods, pch = 16, cex = 0.2, xlab = "log(fold change)", 
     ylab = "log(odds)")
 ord <- order(efit$lods, decreasing = TRUE)
@@ -539,7 +548,7 @@ Do the equivalent plots for \texttt{P.Value}.
 \subsection{Reading Data into R, with weight information incorporated}
 
 Read the data in, with weighting information included:
-<<echo=t, eval=t, results=hide>>=
+<<echo=TRUE, eval=TRUE, results=hide>>=
 coral2RG <- read.maimages(targets$FileName, 
                          source = "spot",
                          wt.fun=wtarea(100))
@@ -551,12 +560,12 @@ on \texttt{coral2RG}.
 
 \subsection{MA plots \& Normalization}
 Apply print tip loess normalization, and check the MA plots:
-<<echo=t, eval=t>>=
+<<echo=TRUE, eval=TRUE>>=
 MA2 <- normalizeWithinArrays(coral2RG, method = "printtiploess")
 plotPrintTipLoess(MA2)
 @ Next, we check whether normalization seems required between arrays,
 then scale normalize between arrays, and repeat the boxplot:
-<<echo=t, eval=t>>=
+<<echo=TRUE, eval=TRUE>>=
 boxplot(MA2$M ~ col(MA2$M), names = colnames(MA2$M))
 nMA2 <- normalizeBetweenArrays(MA2)
 boxplot(nMA2$M ~ col(nMA2$M), names = colnames(nMA2$M))
@@ -565,21 +574,21 @@ boxplot(nMA2$M ~ col(nMA2$M), names = colnames(nMA2$M))
 \subsubsection*{Slide 5, again!}
 Use \texttt{imageplot()} with the M-values on all these half-slides, and look
 especially at half-slide 5, thus:
-<<echo=t, eval=t>>=
+<<echo=TRUE, eval=TRUE>>=
 imageplot(nMA2$M[,5], layout=coral2RG$printer)
 @ 
 Use of the quality information has not made much difference to this plot:
 
 \subsubsection*{Fitting the statistical model}
 To fit a model that reflects this design, specify:
-<<echo=t, eval=t>>=
+<<echo=TRUE, eval=TRUE>>=
 design <- c(-1, 1, -1, 1, 0, 1)
 fit2 <- lmFit(nMA2, design)
 @ 
 
 From the fit object, we calculate empirical Bayes moderated 
 $t$-statistics and do a qq-plot:
-<<echo=t, eval=t>>=
+<<echo=TRUE, eval=TRUE>>=
 efit2 <- eBayes(fit2)
 qqt(efit2$t, df = efit2$df.prior + efit2$df.residual, pch = 16, 
     cex = 0.2)
@@ -587,20 +596,20 @@ qqt(efit2$t, df = efit2$df.prior + efit2$df.residual, pch = 16,
 
 Next we print out a table that shows the top 50 differentially
 expressed genes, in order of the moderated $t$-statistic values:
-<<echo=t, eval=t, results=hide>>=
+<<echo=TRUE, eval=TRUE, results=hide>>=
 options(digits = 3)
 topTable(efit2, number = 50)
 @ 
 
 Now see what different the use of weights has made to the list
 (the vector \texttt{topvals} was found earlier):
-<<echo=t, eval=t, results=hide>>=
+<<echo=TRUE, eval=TRUE, results=hide>>=
 ## Get & store results with & without weights
 topvals2 <- topTable(efit2, number = 50)
 cbind(row.names(topvals), row.names(topvals2))
 @
 Now check how many of the genes are in common across both lists:
-<<echo=t, eval=t, results=hide>>=
+<<echo=TRUE, eval=TRUE, results=hide>>=
 sum(row.names(topvals)%in%row.names(topvals2))
 @  
 \section*{Appendix}
@@ -628,7 +637,7 @@ For installation from the command line, see the Bioconductor site
 
 The function \texttt{imgplot()} gives a display that is a bit
 different from \texttt{imageplot()}. Try:
-<<echo=t, eval=t>>=
+<<echo=TRUE, eval=TRUE>>=
 imgplot(coralRG$R[, 1], layout = coralRG$printer)
 @
 By default, this shows just the smallest 5\% of intensities and the
