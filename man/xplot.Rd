@@ -7,7 +7,12 @@ multiple columns of a matrix of gene expression values. A boxplot
 that shows the distribution of values appears below each panel.
 }
 \usage{
-xplot(data = coralRG$R, images = 1:6, layout = coralRG$printer, mfrow = c(3, 2), FUN = imgplot, device = NULL, title = NULL, width = 7.5, height = 10, paneltitles = c("1:R/G", "2:G/R", "3:R/G", "4:G/R", "5:R/G", "6:G/R"), paneltitles.line = 0.5, mar = c(3.6, 3.6, 1.6, 0.6), oma = c(0.6, 0.6, 1.6, 0.6), file = NULL)
+xplot(data = coralRG$R, images = 1:6, layout = coralRG$printer, mfrow =
+c(3, 2),
+FUN = imgplot, device = NULL, title = NULL, width = 7.5, height = 10,
+paneltitles = c("1:R/G", "2:G/R", "3:R/G", "4:G/R", "5:R/G", "6:G/R"),
+paneltitles.line = 0.5,
+mar = c(3.6, 3.6, 1.6, 0.6), oma = c(0.6, 0.6, 1.6, 0.6), file = NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

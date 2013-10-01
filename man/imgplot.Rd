@@ -10,9 +10,12 @@
      in the sma package.
 }
 \usage{
-imgplot(z = coralRG$R[, 1], layout = coralRG$printer, crit1 = 0.05, crit2 = crit1, key.side = 2, lohi.colors = c("#9E0142", "#D53E4F", "#F46D43", "#FDAE61", "#ABDDA4", "#66C2A5", "#3288BD", "#5E4FA2"), nacolor = "#FFFF00", boxplot.side = 1, split = "quantiles")
+imgplot(z = coralRG$R[, 1], layout = coralRG$printer, crit1 = 0.05,
+crit2 = crit1, key.side=2,
+lohi.colors = c("#9E0142", "#D53E4F", "#F46D43", "#FDAE61", "#ABDDA4",
+"#66C2A5", "#3288BD", "#5E4FA2"), nacolor = "#FFFF00",
+boxplot.side = 1, split = "quantiles")
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{z}{values to be plotted}
   \item{layout}{layout of spots, in the order (rows of grids, columns of
@@ -51,12 +54,12 @@ function (z=coralRG$R[,1], layout=coralRG$printer, crit1 = 0.05,
       xy <- aperm(xy, c(1,3,2,4))
       dim(xy) <- c(sc*gc, gr*sr)
       xy}
-  quantile.na <- function (z, ...) 
+  quantile.na <- function (z, ...)
     {
       tmp <- !(is.na(z) | is.infinite(z))
       quantile(z[tmp], ...)
     }
-  length.na <- function (z, ...) 
+  length.na <- function (z, ...)
     {
       tmp <- !(is.na(z) | is.infinite(z))
       length(z[tmp], ...)
@@ -81,11 +84,11 @@ function (z=coralRG$R[,1], layout=coralRG$printer, crit1 = 0.05,
     }
     par(xpd=FALSE)
   }
-  if (crit1 >= 1) 
+  if (crit1 >= 1)
     crit1 <- crit1/(length.na(z))
-  if (crit2 >= 1) 
+  if (crit2 >= 1)
     crit2 <- crit2/(length.na(z))
-  tmpind <- (z > quantile.na(z, probs = 1 - crit2)) | (z < 
+  tmpind <- (z > quantile.na(z, probs = 1 - crit2)) | (z <
                                   quantile.na(z, probs = crit1))
   n <- prod(unlist(layout))
   n.all <- length(z)
@@ -107,7 +110,7 @@ function (z=coralRG$R[,1], layout=coralRG$printer, crit1 = 0.05,
     phi[-1] <- sapply(quiles2[-1],
                       function(x, z)sum(z<=x, na.rm=TRUE)/length.na(z), z=z)
   }
-  
+
   if(crit1+crit2<1){
     quiles <- c(quiles1,quiles2)
     frac <- c(plo, phi)
@@ -142,7 +145,8 @@ function (z=coralRG$R[,1], layout=coralRG$printer, crit1 = 0.05,
   }
   else fullm[!tmpind] <- NA
   if ((length(as.vector(z)) != n) & (is.null(names(z)))) {
-    stop(" Error: Length of vector is different from total number of spots and vector has no row.name.\n")
+    stop(paste("Error: Length of vector is different from total number\n",
+               "of spots and vector has no row.name.\n"))
   }
 #################################################################
   gc <- layout$ngrid.c
@@ -150,7 +154,7 @@ function (z=coralRG$R[,1], layout=coralRG$printer, crit1 = 0.05,
   sc <- layout$nspot.c
   sr <- layout$nspot.r
   full <- block2matrix(fullm, sr, sc, gr, gc)
-  image(1:ncol(full), 1:nrow(full), t(full), axes = FALSE, 
+  image(1:ncol(full), 1:nrow(full), t(full), axes = FALSE,
         xlab = "", ylab = "", col=colpal)
   box()
   abline(v = ((gr - 1):1) * (sr) + 0.5)
@@ -175,7 +179,7 @@ function (z=coralRG$R[,1], layout=coralRG$printer, crit1 = 0.05,
     yvals2 <- seq(from=par()$usr[3], to=par()$usr[4],
                   length=n2+midbreak+2*nacat+1)[-(n2+midbreak+2*nacat+1)]
     eps2 <- diff(yvals2[1:2])
-    
+
     if(nacat){
       nlast <- length(yvals2)
       nclast <- length(colpal)
@@ -198,7 +202,7 @@ function (z=coralRG$R[,1], layout=coralRG$printer, crit1 = 0.05,
            srt=srt, xpd=TRUE, cex=0.65)
       text(xquilepos, yvals2[length(yvals2)]+eps2, "(100\%)", srt=srt,
            xpd=TRUE, cex=0.65)
-      
+
     }
     else {rect(x0, yvals2[1:nhalf], x0+barwid, yvals2[1:nhalf]+eps2,
                col=colpal[1:nhalf], xpd=TRUE)
