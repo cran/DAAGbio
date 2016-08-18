@@ -1,5 +1,5 @@
 `imgplot` <-
-function (z=coralRG$R[,1], layout=coralRG$printer, crit1 = 0.05,
+function (z=DAAGbio::coralRG$R[,1], layout=DAAGbio::coralRG$printer, crit1 = 0.05,
             crit2 = crit1, key.side=2,
             lohi.colors=c("#9E0142","#D53E4F","#F46D43","#FDAE61",
               "#ABDDA4","#66C2A5","#3288BD","#5E4FA2"),

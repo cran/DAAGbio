@@ -7,7 +7,7 @@ multiple columns of a matrix of gene expression values. A boxplot
 that shows the distribution of values appears below each panel.
 }
 \usage{
-xplot(data = coralRG$R, images = 1:6, layout = coralRG$printer, mfrow =
+xplot(data = DAAGbio::coralRG$R, images = 1:6, layout = DAAGbio::coralRG$printer, mfrow =
 c(3, 2),
 FUN = imgplot, device = NULL, title = NULL, width = 7.5, height = 10,
 paneltitles = c("1:R/G", "2:G/R", "3:R/G", "4:G/R", "5:R/G", "6:G/R"),
@@ -43,7 +43,7 @@ xplot(data=coralRG$R, layout=coralRG$printer, FUN=imgplot)
 }
 
 ## The function is currently defined as
-function(data = coralRG$R, images=1:6, layout = coralRG$printer, mfrow=c(3,2),
+function(data = DAAGbio::coralRG$R, images=1:6, layout = DAAGbio::coralRG$printer, mfrow=c(3,2),
            FUN = imgplot, device=NULL, title=NULL, width=7.5, height=10,
            paneltitles=c("1:R/G","2:G/R", "3:R/G","4:G/R", "5:R/G","6:G/R"),
            paneltitles.line=0.5,

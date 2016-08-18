@@ -1,0 +1,8 @@
+                 Changes in DAAGbio version 0.63
+                 
+NEW FEATURES
+  o The dataset plantStressCounts, holding mRNA counts for 
+    three replicates of each of three treatments, has been
+    added.
+
+

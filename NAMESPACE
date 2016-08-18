@@ -1,3 +1,8 @@
 ## Export all
 
 export(imgplot, plotprintseq, xplot)
+importFrom(limma, voom, lmFit, eBayes, makeContrasts, contrasts.fit)
+importFrom("grDevices", "dev.off")
+importFrom("graphics", "abline", "axis", "box", "boxplot", "image",
+             "mtext", "par", "plot", "points", "rect", "text")
+importFrom("stats", "quantile")

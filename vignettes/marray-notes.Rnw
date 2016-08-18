@@ -1,6 +1,6 @@
-% \VignetteIndexEntry{Laboratory Notes - Analysis of Microarray Data}
-% \VignettePackage{DAAGbio}
 \documentclass[a4paper,9pt]{article}
+%\VignetteEngine{knitr::knitr}
+%\VignetteIndexEntry{Laboratory Notes - Analysis of Microarray Data}
 \usepackage{a4wide}
 \usepackage{graphicx,color}
 \usepackage{amsmath,amssymb}
@@ -16,16 +16,15 @@
 \section*{John Maindonald}
 Centre for Mathematics \& its Applications, Australian National University
 
-\subsection*{Revised October 5 2013}
+\subsection*{Revised August 14 2016}
 \end{center}
 \vspace*{0.5cm}
 
-The example data will be for spotted (two-channel) microarrays.  Exactly
-the same approaches are relevant to spotted oligonucleotides.
+The example data will be for spotted (two-channel) microarrays.  Exactly the same approaches are relevant to spotted 
+oligonucleotides.
 
 \section{Spotted Microarray Methodology \& Tools}
-Each array (``slide'') typically compares expression in genes from one
-``sample'' (type of cell) with expression in genes from another
+Each array (``slide'') typically compares expression in genes from one ``sample'' (type of cell) with expression in genes from another
 ``sample''. The common dyes are Cy5 (``red'') and Cy3 (``green'').
 
 Steps in the process of getting microarray intensity measurements are:
@@ -166,7 +165,7 @@ created.  I have created a second targets file --
 \textbf{coralTargsp.txt}, in which the separators are spaces.  For
 this, enter:\\
 \texttt{targets <- readTargets("coralTargsp.txt", path=path2data, sep="")}}
-<<readTargets, echo=TRUE, eval=TRUE, results=hide>>=
+<<readTargets, echo=TRUE, eval=TRUE, results="hide">>=
 targets <- readTargets("coralTargets.txt", path=path2data)
 targets$FileName     # Display the file names
 @
@@ -192,7 +191,7 @@ is not compulsory, but serves as a useful reminder that the structure
 has information on the red signal and red background (\texttt{R} and
 \texttt{Rb}), and on the green signal and green background (\texttt{G}
 and \texttt{Gb}).
-<<read-images, echo=TRUE, eval=TRUE, results=hide>>=
+<<read-images, echo=TRUE, eval=TRUE, results="hide">>=
 coralRG <- read.maimages(targets$FileName, source = "spot",
     path=path2data,
     other.columns=list(area="area", badspot="badspot"))
@@ -202,7 +201,7 @@ which it is however useful to use to read in quality measures.
 
 Various summary information can be obtained for the different half-slides and
 measures.  Foe example:
-<<echo=TRUE, eval=TRUE, results=hide>>=
+<<echo=TRUE, eval=TRUE, results="hide">>=
 summary(coralRG$other$area)
 @ %
 However these may not mean much for those who are new to microarray
@@ -222,7 +221,7 @@ Next, additional information will be tagged on to the \texttt{coralRG}
 structure, first gene annotation information that is read from the
 \textbf{.gal} file, and then information on the way that the
 half-slides were printed that can be deduced from the gene annotation file.
-<<echo=TRUE, eval=TRUE, results=hide>>=
+<<echo=TRUE, eval=TRUE, results="hide">>=
 coralRG$genes <- readGAL(path=path2data)
 coralRG$printer <- getLayout(coralRG$genes)
 coralRG$printer
@@ -310,18 +309,18 @@ columns layout.  For this, use the function \texttt{xplot()},
 included in the \textit{DAAGbio} package.
 
 As an example, to get the six plots for the red channel on the screen, type:
-\begin{verbatim}
+<<six-plots, eval=FALSE>>=
 x11(width=7.5, height=11)
 xplot(data = coralRG$R, layout = coralRG$printer, FUN=imageplot)
-\end{verbatim}
+@ %
 (Under Macintosh OSX with the Aqua GUI, specify
 \texttt{quartz(width=7.5, height=11)} to use the quartz device.
 It is also possible to send the output to a hard copy.  Type, e.g.:
-\begin{verbatim}
+<<hard-copy, eval=FALSE>>=
 quartz(width=7.5, height=11)
 xplot(data = coralRG$R, layout = coralRG$printer, FUN=imageplot,
        device=pdf)
-\end{verbatim}
+@ %
 Other possibilities for \texttt{device} are \texttt{device="ps"},
 \texttt{device="png"}, \texttt{device="jpeg"} and
 \texttt{device="bmp"}.  For \texttt{device="png"} and
@@ -357,11 +356,11 @@ i.e., against what are called the A-values.
 To see all six arrays in a single plot, precede the six plots
 (first with \texttt{array=1}, then \texttt{array=1}, \ldots)
 with:
-\begin{verbatim}
+<<all-six, eval=FALSE>>=
 oldpar <- par(mfrow=c(3,2), mar=c(5.1, 4.1, 1.1, 0.6))
 ## When done with the 3 by 2 layout, be sure to type
 par(oldpar)     # This returns to the original settings.
-\end{verbatim}
+@ %
 In some of the plots, the dye bias is rather strongly density dependent.
 
 It is also possible to do the following:
@@ -382,7 +381,7 @@ Next, we check whether normalization seems required between arrays:
 <<echo=TRUE, eval=FALSE>>=
 boxplot(MA$M ~ col(MA$M), names = colnames(MA$M))
 @
-(There is a good explanation of boxplots at:
+(There is a helpful explanation of boxplots at:
 \url{http://davidmlane.com/hyperstat/A38393.html})
 
 As the arrays seem to have different spreads of M-values, we scale
@@ -405,8 +404,8 @@ from the total data.
 wanted <- coralRG$genes$Status == "diff-exp ctl"
 rawdeM <- rawMA$M[wanted, ]
 pairs(rawdeM)
-@
-The differentially expresed controls line up remarkably well
+@ %
+The differentially expressed controls line up remarkably well
 across the different half-slides.  Notice that half-slide 5 is the odd
 one out.  (Why is the correlation sometimes positive and
 sometimes negative? What is the pattern?)
@@ -416,7 +415,8 @@ We now repeat this exercise with the normalized data:
 wanted <- coralRG$genes$Status == "diff-exp ctl"
 deM <- nMA$M[wanted, ]
 pairs(rawdeM)
-@ Half-slide 5 is still a maverick.  The differentially expressed
+@ %
+Half-slide 5 is still a maverick.  The differentially expressed
 controls from the other half-slides line up beautifully.\newline [Dear
 me! Every family of more than two or three has a misfit.  We'll banish
 half-slide 5 from our assemblage, at least until we can think of
@@ -427,7 +427,7 @@ Use \texttt{imageplot()} with the M-values on all these half-slides, and look
 especially at half-slide 5, thus:
 <<echo=TRUE, eval=TRUE>>=
 imageplot(nMA$M[,5], layout=coralRG$printer)
-@
+@ %
 Something bad clearly happened to the left side of this half-slide!
 
 \section{Tests for Differential Expression}
@@ -497,7 +497,8 @@ $t$-statistics and do a qq-plot:
 efit <- eBayes(fit)
 qqt(efit$t, df = efit$df.prior + efit$df.residual, pch = 16,
     cex = 0.2)
-@ The majority of genes lie on a line that goes through the centre of
+@ %
+The majority of genes lie on a line that goes through the centre of
 the plot.  Those that lie off this (below it on the left, or above it
 on the right) are most likely to be differentially expressed.
 \footnote{If the results from the different genes were independent,
@@ -508,7 +509,7 @@ the genes lie has a much steeper slope than this 45$^\circ$ line.}
 
 Next we print out a table that shows the top 50 differentially
 expressed genes, in order of the moderated $t$-statistic values:
-<<echo=TRUE, eval=TRUE, results=hide>>=
+<<echo=TRUE, eval=TRUE, results="hide">>=
 options(digits = 3)
 topvals <- topTable(efit, number = 50)
 topvals
@@ -530,22 +531,22 @@ ord <- order(efit$lods, decreasing = TRUE)
 top8 <- ord[1:8]
 text(efit$coef[top8], efit$lods[top8], labels = coralRG$genes[top8,
     "Name"], cex = 0.8, col = "blue")
-@
+@ %
 
 \paragraph{Exercise:} Change the prior probability to 0.02, i.e.
-\begin{verbatim}
+<<prior02, eval=FALSE>>=
 efit.02 <- eBayes(fit, prop=0.02)
 topTable(efit.02, number = 50)
-\end{verbatim}
+@ %
 Observe what difference this makes to the list.  Try also \texttt{prob=0.1}.
 A good way to see the effect is to plot the \texttt{P.Value} or \texttt{B}
 from the separate fits, one against the other:
-\begin{verbatim}
+<<prior01, eval=FALSE>>=
 efit.1 <- eBayes(fit, prop=0.1)
 B.1 <- topTable(efit.1, number = 3072)$B
 B.01 <- topvals$B
 points(B.01, B.1, col="gray")
-\end{verbatim}
+@ %
 
 Do the equivalent plots for \texttt{P.Value}.
 
@@ -553,14 +554,14 @@ Do the equivalent plots for \texttt{P.Value}.
 \subsection{Reading Data into R, with weight information incorporated}
 
 Read the data in, with weighting information included:
-<<echo=TRUE, eval=TRUE, results=hide>>=
+<<echo=TRUE, eval=TRUE, results="hide">>=
 coral2RG <- read.maimages(targets$FileName,
                          source = "spot",
                          path=path2data,
                          wt.fun=wtarea(100))
 coral2RG$genes <- readGAL(path=path2data)
 coral2RG$printer <- getLayout(coral2RG$genes)
-@
+@ %
 The weights will be used automatically by functions that operate
 on \texttt{coral2RG}.
 
@@ -569,20 +570,21 @@ Apply print tip loess normalization, and check the MA plots:
 <<echo=TRUE, eval=TRUE>>=
 MA2 <- normalizeWithinArrays(coral2RG, method = "printtiploess")
 plotPrintTipLoess(MA2)
-@ Next, we check whether normalization seems required between arrays,
+@ %
+Next, we check whether normalization seems required between arrays,
 then scale normalize between arrays, and repeat the boxplot:
 <<echo=TRUE, eval=TRUE>>=
 boxplot(MA2$M ~ col(MA2$M), names = colnames(MA2$M))
 nMA2 <- normalizeBetweenArrays(MA2)
 boxplot(nMA2$M ~ col(nMA2$M), names = colnames(nMA2$M))
-@
+@ %
 
 \subsubsection*{Slide 5, again!}
 Use \texttt{imageplot()} with the M-values on all these half-slides, and look
 especially at half-slide 5, thus:
 <<echo=TRUE, eval=TRUE>>=
 imageplot(nMA2$M[,5], layout=coral2RG$printer)
-@
+@ %
 Use of the quality information has not made much difference to this plot:
 
 \subsubsection*{Fitting the statistical model}
@@ -590,7 +592,7 @@ To fit a model that reflects this design, specify:
 <<echo=TRUE, eval=TRUE>>=
 design <- c(-1, 1, -1, 1, 0, 1)
 fit2 <- lmFit(nMA2, design)
-@
+@ %
 
 From the fit object, we calculate empirical Bayes moderated
 $t$-statistics and do a qq-plot:
@@ -602,22 +604,22 @@ qqt(efit2$t, df = efit2$df.prior + efit2$df.residual, pch = 16,
 
 Next we print out a table that shows the top 50 differentially
 expressed genes, in order of the moderated $t$-statistic values:
-<<echo=TRUE, eval=TRUE, results=hide>>=
+<<echo=TRUE, eval=TRUE, results="hide">>=
 options(digits = 3)
 topTable(efit2, number = 50)
-@
+@ %
 
 Now see what different the use of weights has made to the list
 (the vector \texttt{topvals} was found earlier):
-<<echo=TRUE, eval=TRUE, results=hide>>=
+<<echo=TRUE, eval=TRUE, results="hide">>=
 ## Get & store results with & without weights
 topvals2 <- topTable(efit2, number = 50)
 cbind(row.names(topvals), row.names(topvals2))
-@
+@ %
 Now check how many of the genes are in common across both lists:
-<<echo=TRUE, eval=TRUE, results=hide>>=
+<<echo=TRUE, eval=TRUE, results="hide">>=
 sum(row.names(topvals)%in%row.names(topvals2))
-@
+@ %
 \section*{Appendix}
 
 \subsection*{Installation of the R software}
@@ -625,17 +627,10 @@ First install R (2.10.0 or later).  (Versions are available for Unix,
 Linux, Windows and Macintosh OS X.)
 
 Install the \textit{limma} and \textit{DAAGbio} packages.
-This can be done from an R session\\
-EITHER click the \underline{Packages} menu item, then on
-\underline{Install Package(s) from local zip files...}, etc.\newline
-OR click the \underline{Packages} menu item, then on
-\underline{Install Package(s) from Bioconductor}, etc.\newline
-[On the Mac OS X Aqua GUI for R, click on \underline{Packages \& Data}, then
-\underline{Package Installer}, set the repository to
-\underline{BioConductor (binaries)}, click on \underline{Get List}, etc.]\\
+Install {\em DAAGbio} package from CRAN.  
 
-For installation from the command line, see the Bioconductor site
-(\url{http://www.bioconductor.org/}) for instructions.
+See \url{http://www.bioconductor.org/packages/release/bioc/html/limma.html}
+for instructions on installing {\em limma}. 
 
 
 \subsection{\texttt{imgplot()} as an alternative to
@@ -655,21 +650,22 @@ Remember however that what is important is the pattern
 that appears after background correction (if any),
 normalization and the calculation of the M-values.
 
+\subsection*{How was this document produced?}
+The document \textbf{marray-notes.Rnw} can be copied into the
+working directory.  
 
-\subsection*{How was this document produced}
-The document \textbf{marray-wkshp05.Rnw} can be copied into the
-working directory.  Then from within an R session, enter:
-\begin{verbatim}
-library(tools)
-Sweave("marray-notes.Rnw")
-\end{verbatim}
+Alternatively, from within an R session, enter:
+<<process-Rnw, eval=FALSE>>=
+library(knitr)
+knit("marray-notes.Rnw")
+@ %
 This produces a \LaTeX\ document that can then be processed through the
 \LaTeX\ document preparation system to give a postscript or pdf file.
 
 This is a great way to document your eventual analyses.  Changes to
 the code in the \textbf{.Rnw} document are automatically reflected
-in the \LaTeX\ document that comes from \texttt{Sweave()}.
-See \texttt{help(Sweave)} for information on documentation.
+in the \LaTeX\ document that comes from \texttt{knit()}.
+See \texttt{help(knit)} for information on documentation.
 
 \subsection*{References}
 \begin{itemize}
