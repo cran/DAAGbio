@@ -1,9 +1,10 @@
-628ef06e44aed6b4892f2ff8a512b96e *DESCRIPTION
+78639b68d71595cb256051215425f10f *DESCRIPTION
 437f4f5f157374dd63133db25cb7b2f4 *NAMESPACE
 241af2ea8cf122cb48a5da2d0ea90c7d *NEWS
 73b89697d25c936c618d96e48b9fa2ff *R/imgplot.R
 a8adc80dff538b07a57220ed6667ee4d *R/plotprintseq.R
 cef587de0ff5bcc16b55fd37ffce1b63 *R/xplot.R
+f883ebb2b7ba539552befdad7a09d720 *build/vignette.rds
 89ab1422dc71248c07d99db487196aa4 *data/DEnma.RData
 13c303a0fe443bb00b2024389abd558c *data/coralRG.rda
 f64e8892ea8222d95bfd8d862d0b7f1b *data/coralTargets.RData
@@ -18,7 +19,9 @@ cf59db56b7d4b0f759ec3d9cb5ce0d24 *inst/doc/coral552.spot
 3b1252777a82ed85b1350e31ee8bd927 *inst/doc/coral556.spot
 9c05f144c195b24de23a727bd1f477b4 *inst/doc/coralTargets.txt
 5ce532265ef2985a755e28480e0297e0 *inst/doc/dk_coral-annotated.gal
-5ff6d497cbc87538a5b25f94f573963a *inst/doc/marray-notes.pdf
+aa04b1b2736921783737f3ecaa037fd5 *inst/doc/marray-notes.R
+0a829e38816714c68e37fad882351df4 *inst/doc/marray-notes.Rnw
+8b59a9d95f51fd725ec7b9e7f9e8133a *inst/doc/marray-notes.pdf
 ecc917906b58c5aadc994606614ed25c *man/DEnma.Rd
 b7a347663ed493ca0024bff89add991e *man/coralRG.Rd
 bbe5bd43fbdec636499dbd67106e6128 *man/coralTargets.Rd
@@ -27,8 +30,5 @@ a1885259510a2cf6fd26150c06957d7d *man/plantStressCounts.Rd
 bf140e3a58ca8779cd804c115b6c7d02 *man/plotprintseq.Rd
 601c6273790543767348e34762bf6e17 *man/primateDNA.Rd
 97e9a441297aab2f6722e15afc38638e *man/xplot.Rd
-ac9975a0d6041a166a897d0419a57c90 *vignettes/marray-notes-concordance.tex
-fcc6afc9c529de257114e3d719ebe0b2 *vignettes/marray-notes.Rnw
-404ac4e7c37112a3bf8a4cee6a22c465 *vignettes/marray-notes.pdf
-9716089fba4ebfe9e7774036b17431f7 *vignettes/marray-notes.synctex.gz
-9ec4981190aa28558cb80a797b1a896d *vignettes/marray-notes.tex
+f7c6e45ae074718d036543630d792458 *vignettes/marray-notes-concordance.tex
+0a829e38816714c68e37fad882351df4 *vignettes/marray-notes.Rnw

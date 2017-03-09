@@ -1,55 +1,6 @@
-% \VignetteIndexEntry{Laboratory Notes - Analysis of Microarray Data}
-% \VignettePackage{DAAGbio}
-\documentclass[a4paper,9pt]{article}\usepackage[]{graphicx}\usepackage[]{color}
-%% maxwidth is the original width if it is less than linewidth
-%% otherwise use linewidth (to make sure the graphics do not exceed the margin)
-\makeatletter
-\def\maxwidth{ %
-  \ifdim\Gin@nat@width>\linewidth
-    \linewidth
-  \else
-    \Gin@nat@width
-  \fi
-}
-\makeatother
-
-\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
-\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
-\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
-\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
-\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
-\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
-\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
-\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
-\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
-\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
-
-\usepackage{framed}
-\makeatletter
-\newenvironment{kframe}{%
- \def\at@end@of@kframe{}%
- \ifinner\ifhmode%
-  \def\at@end@of@kframe{\end{minipage}}%
-  \begin{minipage}{\columnwidth}%
- \fi\fi%
- \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
- \colorbox{shadecolor}{##1}\hskip-\fboxsep
-     % There is no \\@totalrightmargin, so:
-     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
- \MakeFramed {\advance\hsize-\width
-   \@totalleftmargin\z@ \linewidth\hsize
-   \@setminipage}}%
- {\par\unskip\endMakeFramed%
- \at@end@of@kframe}
-\makeatother
-
-\definecolor{shadecolor}{rgb}{.97, .97, .97}
-\definecolor{messagecolor}{rgb}{0, 0, 0}
-\definecolor{warningcolor}{rgb}{1, 0, 1}
-\definecolor{errorcolor}{rgb}{1, 0, 0}
-\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
-
-\usepackage{alltt}
+\documentclass[a4paper,9pt]{article}
+%\VignetteEngine{knitr::knitr}
+%\VignetteIndexEntry{Laboratory Notes - Analysis of Microarray Data}
 \usepackage{a4wide}
 \usepackage{graphicx,color}
 \usepackage{amsmath,amssymb}
@@ -58,24 +9,23 @@
 \usepackage{url}
 % \usepackage{exercises}
 \VerbatimFootnotes
-\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
 \begin{document}
 \begin{center}
 \section*{\LARGE \bf Analysis of Spotted  Microarray Data}
 
 \section*{John Maindonald}
-Centre for Mathematics \& its Applications, Australian National University
+Statistics Research Associates\\
+\url{http://www.statsresearch.co.nz/}
 
-\subsection*{Revised October 5 2013}
+\subsection*{Revised August 14 2016}
 \end{center}
 \vspace*{0.5cm}
 
-The example data will be for spotted (two-channel) microarrays.  Exactly
-the same approaches are relevant to spotted oligonucleotides.
+The example data will be for spotted (two-channel) microarrays.  Exactly the same approaches are relevant to spotted 
+oligonucleotides.
 
 \section{Spotted Microarray Methodology \& Tools}
-Each array (``slide'') typically compares expression in genes from one
-``sample'' (type of cell) with expression in genes from another
+Each array (``slide'') typically compares expression in genes from one ``sample'' (type of cell) with expression in genes from another
 ``sample''. The common dyes are Cy5 (``red'') and Cy3 (``green'').
 
 Steps in the process of getting microarray intensity measurements are:
@@ -166,18 +116,10 @@ be used.
 
 The data files that are used here will be accessed from the {\bf doc}
 subdirectory in the {\em DAAGbio} package installation.
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{library}\hlstd{(DAAGbio)}
-\end{alltt}
-
-
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Loading required package: limma}}\begin{alltt}
-\hlstd{path2data} \hlkwb{<-} \hlkwd{system.file}\hlstd{(}\hlstr{"doc"}\hlstd{,} \hlkwc{package}\hlstd{=}\hlstr{"DAAGbio"}\hlstd{)}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
+<<path-to-data, eval=TRUE>>=
+library(DAAGbio)
+path2data <- system.file("doc", package="DAAGbio")
+@ %
 
 \paragraph{Note 1:} For a new project, a good first step is to start a
 new directory that holds the data.  For the purposes of this vignette,
@@ -202,13 +144,9 @@ version 2.10.0 and onwards, able to process such files.
 \subsection*{Attaching the \textit{limma} package}
 
 Start an R session.  From the command line, type
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{library}\hlstd{(limma)}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
+<<load-limma, echo=TRUE, eval=TRUE>>=
+library(limma)
+@ %
 
 \paragraph{Help for \texttt{limma}}
 
@@ -228,14 +166,10 @@ created.  I have created a second targets file --
 \textbf{coralTargsp.txt}, in which the separators are spaces.  For
 this, enter:\\
 \texttt{targets <- readTargets("coralTargsp.txt", path=path2data, sep="")}}
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{targets} \hlkwb{<-} \hlkwd{readTargets}\hlstd{(}\hlstr{"coralTargets.txt"}\hlstd{,} \hlkwc{path}\hlstd{=path2data)}
-\hlstd{targets}\hlopt{$}\hlstd{FileName}     \hlcom{# Display the file names}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
+<<readTargets, echo=TRUE, eval=TRUE, results="hide">>=
+targets <- readTargets("coralTargets.txt", path=path2data)
+targets$FileName     # Display the file names
+@
 The first command gets the targets information.
 The names of the files are stored in the \texttt{FileName} column.\footnote{
 \begin{BVerbatim}[baseline=t]
@@ -246,13 +180,9 @@ fnames <- dir(path=path2data, pattern="\\.spot")
 }
 To see the complete information that has been input:
 \texttt{targets}, type:
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{targets}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
+<<see-targets, echo=TRUE, eval=FALSE>>=
+targets
+@
 
 Next, the function \texttt{read.maimages()} (from the \textit{limma}
 package) will be used to read in the data.  This function puts all the
@@ -262,40 +192,26 @@ is not compulsory, but serves as a useful reminder that the structure
 has information on the red signal and red background (\texttt{R} and
 \texttt{Rb}), and on the green signal and green background (\texttt{G}
 and \texttt{Gb}).
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{coralRG} \hlkwb{<-} \hlkwd{read.maimages}\hlstd{(targets}\hlopt{$}\hlstd{FileName,} \hlkwc{source} \hlstd{=} \hlstr{"spot"}\hlstd{,}
-    \hlkwc{path}\hlstd{=path2data,}
-    \hlkwc{other.columns}\hlstd{=}\hlkwd{list}\hlstd{(}\hlkwc{area}\hlstd{=}\hlstr{"area"}\hlstd{,} \hlkwc{badspot}\hlstd{=}\hlstr{"badspot"}\hlstd{))}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
+<<read-images, echo=TRUE, eval=TRUE, results="hide">>=
+coralRG <- read.maimages(targets$FileName, source = "spot",
+    path=path2data,
+    other.columns=list(area="area", badspot="badspot"))
+@
 The \texttt{other.columns} information is an optional extra,
 which it is however useful to use to read in quality measures.
 
 Various summary information can be obtained for the different half-slides and
 measures.  Foe example:
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{summary}\hlstd{(coralRG}\hlopt{$}\hlstd{other}\hlopt{$}\hlstd{area)}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
+<<echo=TRUE, eval=TRUE, results="hide">>=
+summary(coralRG$other$area)
+@ %
 However these may not mean much for those who are new to microarray
 data. Graphs are in general more helpful.  For example, here is a
 graph that will help in judging the extent to which spots are close to
 the expected 100 units of area.
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{plot}\hlstd{(}\hlkwd{density}\hlstd{(coralRG}\hlopt{$}\hlstd{other}\hlopt{$}\hlstd{area[,}\hlnum{1}\hlstd{]))}
-\end{alltt}
-\end{kframe}
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-2-1} 
-
-\end{knitrout}
+<<echo=TRUE, eval=TRUE>>=
+plot(density(coralRG$other$area[,1]))
+@
 The \textit{limma} package does actually allow for the use of area
 as a measure of quality, with information from spots that are larger
 or smaller than the optimum given a reduced weight in the analysis.
@@ -306,30 +222,20 @@ Next, additional information will be tagged on to the \texttt{coralRG}
 structure, first gene annotation information that is read from the
 \textbf{.gal} file, and then information on the way that the
 half-slides were printed that can be deduced from the gene annotation file.
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{coralRG}\hlopt{$}\hlstd{genes} \hlkwb{<-} \hlkwd{readGAL}\hlstd{(}\hlkwc{path}\hlstd{=path2data)}
-\hlstd{coralRG}\hlopt{$}\hlstd{printer} \hlkwb{<-} \hlkwd{getLayout}\hlstd{(coralRG}\hlopt{$}\hlstd{genes)}
-\hlstd{coralRG}\hlopt{$}\hlstd{printer}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
+<<echo=TRUE, eval=TRUE, results="hide">>=
+coralRG$genes <- readGAL(path=path2data)
+coralRG$printer <- getLayout(coralRG$genes)
+coralRG$printer
+@
 These half slides were printed in a 4 by 4 layout, corresponding to the
 4 by 4 layout of the printhead.  Each tip printed an array of 16 rows
 by 12 columns.  To see the order in which the spots were printed,
 attach the \textit{DAAGbio} package, and run the function
 \texttt{plotprintseq()}, thus:
 and enter:
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{plotprintseq}\hlstd{()}
-\end{alltt}
-\end{kframe}
-\includegraphics[width=\maxwidth]{figure/printseq-1} 
-
-\end{knitrout}
+<<printseq>>=
+plotprintseq()
+@
 
 
 \subsubsection*{The Spot Types File}
@@ -361,22 +267,10 @@ for the ``gene''!!}
 The following extracts the spot type information from the file,
 and appends it to the data structure that I have called
 \texttt{coralRG}:
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{spottypes}\hlkwb{<-}\hlkwd{readSpotTypes}\hlstd{(}\hlkwc{path}\hlstd{=path2data)}
-\hlstd{coralRG}\hlopt{$}\hlstd{genes}\hlopt{$}\hlstd{Status} \hlkwb{<-} \hlkwd{controlStatus}\hlstd{(spottypes, coralRG)}
-\end{alltt}
-\begin{verbatim}
-## Matching patterns for: ID Name 
-## Found 3072 gene 
-## Found 7 negative 
-## Found 30 blank 
-## Found 21 diff-exp ctl 
-## Setting attributes: values Color
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
+<<echo=TRUE, eval=TRUE>>=
+spottypes<-readSpotTypes(path=path2data)
+coralRG$genes$Status <- controlStatus(spottypes, coralRG)
+@
 
 \section{Plots}
 
@@ -399,55 +293,35 @@ There are two possibilities -- to use \texttt{imageplot()} from
 \textit{limma}, or to use my function \texttt{imgplot()} that is
 included in the \textit{DAAGbio} package; see the appendux.  Here are
 plots that use \texttt{imageplot()}:
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{imageplot}\hlstd{(}\hlkwd{log2}\hlstd{(coralRG}\hlopt{$}\hlstd{Rb[,} \hlnum{1}\hlstd{]}\hlopt{+}\hlnum{1}\hlstd{),} \hlkwc{layout} \hlstd{= coralRG}\hlopt{$}\hlstd{printer,}
-          \hlkwc{low}\hlstd{=}\hlstr{"white"}\hlstd{,} \hlkwc{high}\hlstd{=}\hlstr{"red"}\hlstd{)}
-\end{alltt}
-\end{kframe}
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-5-1} 
-
-\end{knitrout}
+<<echo=TRUE, eval=TRUE>>=
+imageplot(log2(coralRG$Rb[, 1]+1), layout = coralRG$printer,
+          low="white", high="red")
+@
 This should be repeated for each different half-slide, for both red and
 green, and similarly for the green background.  To get the plot for the
 second half-slide, type:
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{imageplot}\hlstd{(}\hlkwd{log2}\hlstd{(coralRG}\hlopt{$}\hlstd{Rb[,} \hlnum{2}\hlstd{]}\hlopt{+}\hlnum{1}\hlstd{),} \hlkwc{layout} \hlstd{= coralRG}\hlopt{$}\hlstd{printer,}
-          \hlkwc{low}\hlstd{=}\hlstr{"white"}\hlstd{,} \hlkwc{high}\hlstd{=}\hlstr{"red"}\hlstd{)}
-\end{alltt}
-\end{kframe}
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-6-1} 
-
-\end{knitrout}
+<<echo=TRUE, eval=TRUE>>=
+imageplot(log2(coralRG$Rb[, 2]+1), layout = coralRG$printer,
+          low="white", high="red")
+@
 
 The plots can be obtained all six at once, in a three rows by two
 columns layout.  For this, use the function \texttt{xplot()},
 included in the \textit{DAAGbio} package.
 
 As an example, to get the six plots for the red channel on the screen, type:
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{x11}\hlstd{(}\hlkwc{width}\hlstd{=}\hlnum{7.5}\hlstd{,} \hlkwc{height}\hlstd{=}\hlnum{11}\hlstd{)}
-\hlkwd{xplot}\hlstd{(}\hlkwc{data} \hlstd{= coralRG}\hlopt{$}\hlstd{R,} \hlkwc{layout} \hlstd{= coralRG}\hlopt{$}\hlstd{printer,} \hlkwc{FUN}\hlstd{=imageplot)}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
+<<six-plots, eval=FALSE>>=
+x11(width=7.5, height=11)
+xplot(data = coralRG$R, layout = coralRG$printer, FUN=imageplot)
+@ %
 (Under Macintosh OSX with the Aqua GUI, specify
 \texttt{quartz(width=7.5, height=11)} to use the quartz device.
 It is also possible to send the output to a hard copy.  Type, e.g.:
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{quartz}\hlstd{(}\hlkwc{width}\hlstd{=}\hlnum{7.5}\hlstd{,} \hlkwc{height}\hlstd{=}\hlnum{11}\hlstd{)}
-\hlkwd{xplot}\hlstd{(}\hlkwc{data} \hlstd{= coralRG}\hlopt{$}\hlstd{R,} \hlkwc{layout} \hlstd{= coralRG}\hlopt{$}\hlstd{printer,} \hlkwc{FUN}\hlstd{=imageplot,}
-       \hlkwc{device}\hlstd{=pdf)}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
+<<hard-copy, eval=FALSE>>=
+quartz(width=7.5, height=11)
+xplot(data = coralRG$R, layout = coralRG$printer, FUN=imageplot,
+       device=pdf)
+@ %
 Other possibilities for \texttt{device} are \texttt{device="ps"},
 \texttt{device="png"}, \texttt{device="jpeg"} and
 \texttt{device="bmp"}.  For \texttt{device="png"} and
@@ -473,15 +347,9 @@ typically shows up with higher intensity than the Cy5 channel
 
 First, check what happens if we do not normalize.
 Try the following:
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{plotMA}\hlstd{(coralRG,} \hlkwc{array}\hlstd{=}\hlnum{1}\hlstd{)}
-\end{alltt}
-\end{kframe}
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-7-1} 
-
-\end{knitrout}
+<<echo=TRUE, eval=TRUE>>=
+plotMA(coralRG, array=1)
+@
 This plots the unnormalized log-ratios (the M-values) against the
 the averages of the log-intensities for the two separate channels,
 i.e., against what are called the A-values.
@@ -489,66 +357,40 @@ i.e., against what are called the A-values.
 To see all six arrays in a single plot, precede the six plots
 (first with \texttt{array=1}, then \texttt{array=1}, \ldots)
 with:
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{oldpar} \hlkwb{<-} \hlkwd{par}\hlstd{(}\hlkwc{mfrow}\hlstd{=}\hlkwd{c}\hlstd{(}\hlnum{3}\hlstd{,}\hlnum{2}\hlstd{),} \hlkwc{mar}\hlstd{=}\hlkwd{c}\hlstd{(}\hlnum{5.1}\hlstd{,} \hlnum{4.1}\hlstd{,} \hlnum{1.1}\hlstd{,} \hlnum{0.6}\hlstd{))}
-\hlcom{## When done with the 3 by 2 layout, be sure to type}
-\hlkwd{par}\hlstd{(oldpar)}     \hlcom{# This returns to the original settings.}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
+<<all-six, eval=FALSE>>=
+oldpar <- par(mfrow=c(3,2), mar=c(5.1, 4.1, 1.1, 0.6))
+## When done with the 3 by 2 layout, be sure to type
+par(oldpar)     # This returns to the original settings.
+@ %
 In some of the plots, the dye bias is rather strongly density dependent.
 
 It is also possible to do the following:
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{rawMA} \hlkwb{<-} \hlkwd{normalizeWithinArrays}\hlstd{(coralRG,} \hlkwc{method} \hlstd{=} \hlstr{"none"}\hlstd{)}
-\hlkwd{plotPrintTipLoess}\hlstd{(rawMA,} \hlkwc{array}\hlstd{=}\hlnum{1}\hlstd{)}
-\end{alltt}
-\end{kframe}
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-8-1} 
-
-\end{knitrout}
+<<echo=TRUE, eval=TRUE>>=
+rawMA <- normalizeWithinArrays(coralRG, method = "none")
+plotPrintTipLoess(rawMA, array=1)
+@
 A different curve is fitted for each of the print tip groups.
 There does seem to be some difference in dye bias between the
 different print tip groups.
 
 Next, we apply print tip loess normalization, and check the MA plots:
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{MA} \hlkwb{<-} \hlkwd{normalizeWithinArrays}\hlstd{(coralRG,} \hlkwc{method} \hlstd{=} \hlstr{"printtiploess"}\hlstd{)}
-\hlkwd{plotPrintTipLoess}\hlstd{(MA)}
-\end{alltt}
-\end{kframe}
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-9-1} 
-
-\end{knitrout}
+<<echo=TRUE, eval=TRUE>>=
+MA <- normalizeWithinArrays(coralRG, method = "printtiploess")
+plotPrintTipLoess(MA)
+@
 Next, we check whether normalization seems required between arrays:
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{boxplot}\hlstd{(MA}\hlopt{$}\hlstd{M} \hlopt{~} \hlkwd{col}\hlstd{(MA}\hlopt{$}\hlstd{M),} \hlkwc{names} \hlstd{=} \hlkwd{colnames}\hlstd{(MA}\hlopt{$}\hlstd{M))}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
+<<echo=TRUE, eval=FALSE>>=
+boxplot(MA$M ~ col(MA$M), names = colnames(MA$M))
+@
 (There is a helpful explanation of boxplots at:
 \url{http://davidmlane.com/hyperstat/A38393.html})
 
 As the arrays seem to have different spreads of M-values, we scale
 normalize between arrays, and repeat the boxplot:
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{nMA} \hlkwb{<-} \hlkwd{normalizeBetweenArrays}\hlstd{(MA)}
-\hlkwd{boxplot}\hlstd{(nMA}\hlopt{$}\hlstd{M} \hlopt{~} \hlkwd{col}\hlstd{(nMA}\hlopt{$}\hlstd{M),} \hlkwc{names} \hlstd{=} \hlkwd{colnames}\hlstd{(nMA}\hlopt{$}\hlstd{M))}
-\end{alltt}
-\end{kframe}
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-11-1} 
-
-\end{knitrout}
+<<echo=TRUE, eval=TRUE>>=
+nMA <- normalizeBetweenArrays(MA)
+boxplot(nMA$M ~ col(nMA$M), names = colnames(nMA$M))
+@
 The scaling ensures that the medians, and the upper and lower quartiles,
 agree across the different slides.
 
@@ -559,34 +401,22 @@ differential expression on all sets of results. Do they?
 
 We extract the M-values for the differentially expressed controls
 from the total data.
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{wanted} \hlkwb{<-} \hlstd{coralRG}\hlopt{$}\hlstd{genes}\hlopt{$}\hlstd{Status} \hlopt{==} \hlstr{"diff-exp ctl"}
-\hlstd{rawdeM} \hlkwb{<-} \hlstd{rawMA}\hlopt{$}\hlstd{M[wanted, ]}
-\hlkwd{pairs}\hlstd{(rawdeM)}
-\end{alltt}
-\end{kframe}
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-12-1} 
-
-\end{knitrout}
+<<echo=TRUE, eval=TRUE>>=
+wanted <- coralRG$genes$Status == "diff-exp ctl"
+rawdeM <- rawMA$M[wanted, ]
+pairs(rawdeM)
+@ %
 The differentially expressed controls line up remarkably well
 across the different half-slides.  Notice that half-slide 5 is the odd
 one out.  (Why is the correlation sometimes positive and
 sometimes negative? What is the pattern?)
 
 We now repeat this exercise with the normalized data:
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{wanted} \hlkwb{<-} \hlstd{coralRG}\hlopt{$}\hlstd{genes}\hlopt{$}\hlstd{Status} \hlopt{==} \hlstr{"diff-exp ctl"}
-\hlstd{deM} \hlkwb{<-} \hlstd{nMA}\hlopt{$}\hlstd{M[wanted, ]}
-\hlkwd{pairs}\hlstd{(rawdeM)}
-\end{alltt}
-\end{kframe}
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-13-1} 
-
-\end{knitrout}
+<<echo=TRUE, eval=TRUE>>=
+wanted <- coralRG$genes$Status == "diff-exp ctl"
+deM <- nMA$M[wanted, ]
+pairs(rawdeM)
+@ %
 Half-slide 5 is still a maverick.  The differentially expressed
 controls from the other half-slides line up beautifully.\newline [Dear
 me! Every family of more than two or three has a misfit.  We'll banish
@@ -596,15 +426,9 @@ something better to do with it.]
 \subsubsection*{More plots}
 Use \texttt{imageplot()} with the M-values on all these half-slides, and look
 especially at half-slide 5, thus:
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{imageplot}\hlstd{(nMA}\hlopt{$}\hlstd{M[,}\hlnum{5}\hlstd{],} \hlkwc{layout}\hlstd{=coralRG}\hlopt{$}\hlstd{printer)}
-\end{alltt}
-\end{kframe}
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-14-1} 
-
-\end{knitrout}
+<<echo=TRUE, eval=TRUE>>=
+imageplot(nMA$M[,5], layout=coralRG$printer)
+@ %
 Something bad clearly happened to the left side of this half-slide!
 
 \section{Tests for Differential Expression}
@@ -631,23 +455,15 @@ so that $\log({\rm pre/post)}$ (which equals
 $\log({\rm pre}) - \log({\rm post)}$ becomes $\log({\rm post/pre)}$.
 The 0 for the fifth half-slide will omit it altogether.
 This is achieved by placing these numbers into a ``design vector''.
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{design} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlopt{-}\hlnum{1}\hlstd{,} \hlnum{1}\hlstd{,} \hlopt{-}\hlnum{1}\hlstd{,} \hlnum{1}\hlstd{,} \hlnum{0}\hlstd{,} \hlnum{1}\hlstd{)}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
+<<echo=TRUE, eval=TRUE>>=
+design <- c(-1, 1, -1, 1, 0, 1)
+@
 
 \subsubsection*{Fitting the statistical model}
 To fit a model that reflects this design, specify:
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{fit} \hlkwb{<-} \hlkwd{lmFit}\hlstd{(nMA, design)}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
+<<echo=TRUE, eval=TRUE>>=
+fit <- lmFit(nMA, design)
+@
 This basically gives $t$-test results for all the different spots.
 Any attempt at interpretation has to take account of the large number
 of tests that have been performed.  Also, because there are just 5
@@ -678,17 +494,11 @@ of subjective judgment.]
 
 From the fit object, we calculate empirical Bayes moderated
 $t$-statistics and do a qq-plot:
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{efit} \hlkwb{<-} \hlkwd{eBayes}\hlstd{(fit)}
-\hlkwd{qqt}\hlstd{(efit}\hlopt{$}\hlstd{t,} \hlkwc{df} \hlstd{= efit}\hlopt{$}\hlstd{df.prior} \hlopt{+} \hlstd{efit}\hlopt{$}\hlstd{df.residual,} \hlkwc{pch} \hlstd{=} \hlnum{16}\hlstd{,}
-    \hlkwc{cex} \hlstd{=} \hlnum{0.2}\hlstd{)}
-\end{alltt}
-\end{kframe}
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-17-1} 
-
-\end{knitrout}
+<<echo=TRUE, eval=TRUE>>=
+efit <- eBayes(fit)
+qqt(efit$t, df = efit$df.prior + efit$df.residual, pch = 16,
+    cex = 0.2)
+@ %
 The majority of genes lie on a line that goes through the centre of
 the plot.  Those that lie off this (below it on the left, or above it
 on the right) are most likely to be differentially expressed.
@@ -700,15 +510,11 @@ the genes lie has a much steeper slope than this 45$^\circ$ line.}
 
 Next we print out a table that shows the top 50 differentially
 expressed genes, in order of the moderated $t$-statistic values:
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{options}\hlstd{(}\hlkwc{digits} \hlstd{=} \hlnum{3}\hlstd{)}
-\hlstd{topvals} \hlkwb{<-} \hlkwd{topTable}\hlstd{(efit,} \hlkwc{number} \hlstd{=} \hlnum{50}\hlstd{)}
-\hlstd{topvals}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
+<<echo=TRUE, eval=TRUE, results="hide">>=
+options(digits = 3)
+topvals <- topTable(efit, number = 50)
+topvals
+@
 We store the results in \texttt{topvals} prior to displaying them,
 as they will be used later.  Notice that an adjusted $p$-value of 0.05
 corresponds to a $B$-statistic of about 3.6.  This may be a reasonably
@@ -719,43 +525,29 @@ and $P$-values.  The extent to which the statistics are affected by the
 prior probability will be demonstrated in the exercise below.
 
 Here is another type of plot:
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{plot}\hlstd{(efit}\hlopt{$}\hlstd{coef, efit}\hlopt{$}\hlstd{lods,} \hlkwc{pch} \hlstd{=} \hlnum{16}\hlstd{,} \hlkwc{cex} \hlstd{=} \hlnum{0.2}\hlstd{,} \hlkwc{xlab} \hlstd{=} \hlstr{"log(fold change)"}\hlstd{,}
-    \hlkwc{ylab} \hlstd{=} \hlstr{"log(odds)"}\hlstd{)}
-\hlstd{ord} \hlkwb{<-} \hlkwd{order}\hlstd{(efit}\hlopt{$}\hlstd{lods,} \hlkwc{decreasing} \hlstd{=} \hlnum{TRUE}\hlstd{)}
-\hlstd{top8} \hlkwb{<-} \hlstd{ord[}\hlnum{1}\hlopt{:}\hlnum{8}\hlstd{]}
-\hlkwd{text}\hlstd{(efit}\hlopt{$}\hlstd{coef[top8], efit}\hlopt{$}\hlstd{lods[top8],} \hlkwc{labels} \hlstd{= coralRG}\hlopt{$}\hlstd{genes[top8,}
-    \hlstr{"Name"}\hlstd{],} \hlkwc{cex} \hlstd{=} \hlnum{0.8}\hlstd{,} \hlkwc{col} \hlstd{=} \hlstr{"blue"}\hlstd{)}
-\end{alltt}
-\end{kframe}
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-19-1} 
-
-\end{knitrout}
+<<echo=TRUE, eval=TRUE>>=
+plot(efit$coef, efit$lods, pch = 16, cex = 0.2, xlab = "log(fold change)",
+    ylab = "log(odds)")
+ord <- order(efit$lods, decreasing = TRUE)
+top8 <- ord[1:8]
+text(efit$coef[top8], efit$lods[top8], labels = coralRG$genes[top8,
+    "Name"], cex = 0.8, col = "blue")
+@ %
 
 \paragraph{Exercise:} Change the prior probability to 0.02, i.e.
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{efit.02} \hlkwb{<-} \hlkwd{eBayes}\hlstd{(fit,} \hlkwc{prop}\hlstd{=}\hlnum{0.02}\hlstd{)}
-\hlkwd{topTable}\hlstd{(efit.02,} \hlkwc{number} \hlstd{=} \hlnum{50}\hlstd{)}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
+<<prior02, eval=FALSE>>=
+efit.02 <- eBayes(fit, prop=0.02)
+topTable(efit.02, number = 50)
+@ %
 Observe what difference this makes to the list.  Try also \texttt{prob=0.1}.
 A good way to see the effect is to plot the \texttt{P.Value} or \texttt{B}
 from the separate fits, one against the other:
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{efit.1} \hlkwb{<-} \hlkwd{eBayes}\hlstd{(fit,} \hlkwc{prop}\hlstd{=}\hlnum{0.1}\hlstd{)}
-\hlstd{B.1} \hlkwb{<-} \hlkwd{topTable}\hlstd{(efit.1,} \hlkwc{number} \hlstd{=} \hlnum{3072}\hlstd{)}\hlopt{$}\hlstd{B}
-\hlstd{B.01} \hlkwb{<-} \hlstd{topvals}\hlopt{$}\hlstd{B}
-\hlkwd{points}\hlstd{(B.01, B.1,} \hlkwc{col}\hlstd{=}\hlstr{"gray"}\hlstd{)}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
+<<prior01, eval=FALSE>>=
+efit.1 <- eBayes(fit, prop=0.1)
+B.1 <- topTable(efit.1, number = 3072)$B
+B.01 <- topvals$B
+points(B.01, B.1, col="gray")
+@ %
 
 Do the equivalent plots for \texttt{P.Value}.
 
@@ -763,116 +555,72 @@ Do the equivalent plots for \texttt{P.Value}.
 \subsection{Reading Data into R, with weight information incorporated}
 
 Read the data in, with weighting information included:
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{coral2RG} \hlkwb{<-} \hlkwd{read.maimages}\hlstd{(targets}\hlopt{$}\hlstd{FileName,}
-                         \hlkwc{source} \hlstd{=} \hlstr{"spot"}\hlstd{,}
-                         \hlkwc{path}\hlstd{=path2data,}
-                         \hlkwc{wt.fun}\hlstd{=}\hlkwd{wtarea}\hlstd{(}\hlnum{100}\hlstd{))}
-\hlstd{coral2RG}\hlopt{$}\hlstd{genes} \hlkwb{<-} \hlkwd{readGAL}\hlstd{(}\hlkwc{path}\hlstd{=path2data)}
-\hlstd{coral2RG}\hlopt{$}\hlstd{printer} \hlkwb{<-} \hlkwd{getLayout}\hlstd{(coral2RG}\hlopt{$}\hlstd{genes)}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
+<<echo=TRUE, eval=TRUE, results="hide">>=
+coral2RG <- read.maimages(targets$FileName,
+                         source = "spot",
+                         path=path2data,
+                         wt.fun=wtarea(100))
+coral2RG$genes <- readGAL(path=path2data)
+coral2RG$printer <- getLayout(coral2RG$genes)
+@ %
 The weights will be used automatically by functions that operate
 on \texttt{coral2RG}.
 
 \subsection{MA plots \& Normalization}
 Apply print tip loess normalization, and check the MA plots:
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{MA2} \hlkwb{<-} \hlkwd{normalizeWithinArrays}\hlstd{(coral2RG,} \hlkwc{method} \hlstd{=} \hlstr{"printtiploess"}\hlstd{)}
-\hlkwd{plotPrintTipLoess}\hlstd{(MA2)}
-\end{alltt}
-\end{kframe}
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-21-1} 
-
-\end{knitrout}
+<<echo=TRUE, eval=TRUE>>=
+MA2 <- normalizeWithinArrays(coral2RG, method = "printtiploess")
+plotPrintTipLoess(MA2)
+@ %
 Next, we check whether normalization seems required between arrays,
 then scale normalize between arrays, and repeat the boxplot:
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{boxplot}\hlstd{(MA2}\hlopt{$}\hlstd{M} \hlopt{~} \hlkwd{col}\hlstd{(MA2}\hlopt{$}\hlstd{M),} \hlkwc{names} \hlstd{=} \hlkwd{colnames}\hlstd{(MA2}\hlopt{$}\hlstd{M))}
-\hlstd{nMA2} \hlkwb{<-} \hlkwd{normalizeBetweenArrays}\hlstd{(MA2)}
-\hlkwd{boxplot}\hlstd{(nMA2}\hlopt{$}\hlstd{M} \hlopt{~} \hlkwd{col}\hlstd{(nMA2}\hlopt{$}\hlstd{M),} \hlkwc{names} \hlstd{=} \hlkwd{colnames}\hlstd{(nMA2}\hlopt{$}\hlstd{M))}
-\end{alltt}
-\end{kframe}
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-22-1} 
-
-\end{knitrout}
+<<echo=TRUE, eval=TRUE>>=
+boxplot(MA2$M ~ col(MA2$M), names = colnames(MA2$M))
+nMA2 <- normalizeBetweenArrays(MA2)
+boxplot(nMA2$M ~ col(nMA2$M), names = colnames(nMA2$M))
+@ %
 
 \subsubsection*{Slide 5, again!}
 Use \texttt{imageplot()} with the M-values on all these half-slides, and look
 especially at half-slide 5, thus:
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{imageplot}\hlstd{(nMA2}\hlopt{$}\hlstd{M[,}\hlnum{5}\hlstd{],} \hlkwc{layout}\hlstd{=coral2RG}\hlopt{$}\hlstd{printer)}
-\end{alltt}
-\end{kframe}
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-23-1} 
-
-\end{knitrout}
+<<echo=TRUE, eval=TRUE>>=
+imageplot(nMA2$M[,5], layout=coral2RG$printer)
+@ %
 Use of the quality information has not made much difference to this plot:
 
 \subsubsection*{Fitting the statistical model}
 To fit a model that reflects this design, specify:
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{design} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlopt{-}\hlnum{1}\hlstd{,} \hlnum{1}\hlstd{,} \hlopt{-}\hlnum{1}\hlstd{,} \hlnum{1}\hlstd{,} \hlnum{0}\hlstd{,} \hlnum{1}\hlstd{)}
-\hlstd{fit2} \hlkwb{<-} \hlkwd{lmFit}\hlstd{(nMA2, design)}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
+<<echo=TRUE, eval=TRUE>>=
+design <- c(-1, 1, -1, 1, 0, 1)
+fit2 <- lmFit(nMA2, design)
+@ %
 
 From the fit object, we calculate empirical Bayes moderated
 $t$-statistics and do a qq-plot:
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{efit2} \hlkwb{<-} \hlkwd{eBayes}\hlstd{(fit2)}
-\hlkwd{qqt}\hlstd{(efit2}\hlopt{$}\hlstd{t,} \hlkwc{df} \hlstd{= efit2}\hlopt{$}\hlstd{df.prior} \hlopt{+} \hlstd{efit2}\hlopt{$}\hlstd{df.residual,} \hlkwc{pch} \hlstd{=} \hlnum{16}\hlstd{,}
-    \hlkwc{cex} \hlstd{=} \hlnum{0.2}\hlstd{)}
-\end{alltt}
-\end{kframe}
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-25-1} 
-
-\end{knitrout}
+<<echo=TRUE, eval=TRUE>>=
+efit2 <- eBayes(fit2)
+qqt(efit2$t, df = efit2$df.prior + efit2$df.residual, pch = 16,
+    cex = 0.2)
+@
 
 Next we print out a table that shows the top 50 differentially
 expressed genes, in order of the moderated $t$-statistic values:
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{options}\hlstd{(}\hlkwc{digits} \hlstd{=} \hlnum{3}\hlstd{)}
-\hlkwd{topTable}\hlstd{(efit2,} \hlkwc{number} \hlstd{=} \hlnum{50}\hlstd{)}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
+<<echo=TRUE, eval=TRUE, results="hide">>=
+options(digits = 3)
+topTable(efit2, number = 50)
+@ %
 
 Now see what different the use of weights has made to the list
 (the vector \texttt{topvals} was found earlier):
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlcom{## Get & store results with & without weights}
-\hlstd{topvals2} \hlkwb{<-} \hlkwd{topTable}\hlstd{(efit2,} \hlkwc{number} \hlstd{=} \hlnum{50}\hlstd{)}
-\hlkwd{cbind}\hlstd{(}\hlkwd{row.names}\hlstd{(topvals),} \hlkwd{row.names}\hlstd{(topvals2))}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
+<<echo=TRUE, eval=TRUE, results="hide">>=
+## Get & store results with & without weights
+topvals2 <- topTable(efit2, number = 50)
+cbind(row.names(topvals), row.names(topvals2))
+@ %
 Now check how many of the genes are in common across both lists:
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{sum}\hlstd{(}\hlkwd{row.names}\hlstd{(topvals)}\hlopt{%in%}\hlkwd{row.names}\hlstd{(topvals2))}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
+<<echo=TRUE, eval=TRUE, results="hide">>=
+sum(row.names(topvals)%in%row.names(topvals2))
+@ %
 \section*{Appendix}
 
 \subsection*{Installation of the R software}
@@ -880,17 +628,10 @@ First install R (2.10.0 or later).  (Versions are available for Unix,
 Linux, Windows and Macintosh OS X.)
 
 Install the \textit{limma} and \textit{DAAGbio} packages.
-This can be done from an R session\\
-EITHER click the \underline{Packages} menu item, then on
-\underline{Install Package(s) from local zip files...}, etc.\newline
-OR click the \underline{Packages} menu item, then on
-\underline{Install Package(s) from Bioconductor}, etc.\newline
-[On the Mac OS X Aqua GUI for R, click on \underline{Packages \& Data}, then
-\underline{Package Installer}, set the repository to
-\underline{BioConductor (binaries)}, click on \underline{Get List}, etc.]\\
+Install {\em DAAGbio} package from CRAN.  
 
-For installation from the command line, see the Bioconductor site
-(\url{http://www.bioconductor.org/}) for instructions.
+See \url{http://www.bioconductor.org/packages/release/bioc/html/limma.html}
+for instructions on installing {\em limma}. 
 
 
 \subsection{\texttt{imgplot()} as an alternative to
@@ -898,15 +639,9 @@ For installation from the command line, see the Bioconductor site
 
 The function \texttt{imgplot()} gives a display that is a bit
 different from \texttt{imageplot()}. Try:
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{imgplot}\hlstd{(coralRG}\hlopt{$}\hlstd{R[,} \hlnum{1}\hlstd{],} \hlkwc{layout} \hlstd{= coralRG}\hlopt{$}\hlstd{printer)}
-\end{alltt}
-\end{kframe}
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-29-1} 
-
-\end{knitrout}
+<<echo=TRUE, eval=TRUE>>=
+imgplot(coralRG$R[, 1], layout = coralRG$printer)
+@
 By default, this shows just the smallest 5\% of intensities and the
 largest 5\% of intensities.
 
@@ -916,17 +651,15 @@ Remember however that what is important is the pattern
 that appears after background correction (if any),
 normalization and the calculation of the M-values.
 
-\subsection*{How was this document produced}
+\subsection*{How was this document produced?}
 The document \textbf{marray-notes.Rnw} can be copied into the
-working directory.  Then from within an R session, enter:
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{library}\hlstd{(knitr)}
-\hlkwd{knit}\hlstd{(}\hlstr{"marray-notes.Rnw"}\hlstd{)}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
+working directory.  
+
+Alternatively, from within an R session, enter:
+<<process-Rnw, eval=FALSE>>=
+library(knitr)
+knit("marray-notes.Rnw")
+@ %
 This produces a \LaTeX\ document that can then be processed through the
 \LaTeX\ document preparation system to give a postscript or pdf file.
 

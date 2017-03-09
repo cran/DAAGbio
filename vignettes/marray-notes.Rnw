@@ -14,7 +14,8 @@
 \section*{\LARGE \bf Analysis of Spotted  Microarray Data}
 
 \section*{John Maindonald}
-Centre for Mathematics \& its Applications, Australian National University
+Statistics Research Associates\\
+\url{http://www.statsresearch.co.nz/}
 
 \subsection*{Revised August 14 2016}
 \end{center}
