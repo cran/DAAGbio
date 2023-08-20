@@ -1,10 +1,10 @@
 Package: DAAGbio
-Version: 0.63-3
-Date: 2017-03-09
+Version: 0.63-4
+Date: 2023-08-19
 Title: Data Sets and Functions, for Demonstrations with Expression
         Arrays and Gene Sequences
 Author: John Maindonald
-Maintainer: John Maindonald <john.maindonald@anu.edu.au>
+Maintainer: John Maindonald <jhmaindonald@gmail.com>
 Description: Data sets and functions, for the display of gene expression array (microarray) data, and for demonstrations with such data.
 LazyLoad: true
 LazyData: true
@@ -13,8 +13,8 @@ Suggests: DAAG, locfit, knitr
 ZipData: no
 License: GPL (>= 2)
 VignetteBuilder: knitr
-URL: http://maths-people.anu.edu.au/~johnm/
+URL: https://github.com/jhmaindonald/DAAGbio/
 NeedsCompilation: no
-Packaged: 2017-03-09 03:27:50 UTC; johnm1
+Packaged: 2023-08-19 08:57:32 UTC; johnm1
 Repository: CRAN
-Date/Publication: 2017-03-09 08:18:18
+Date/Publication: 2023-08-20 23:02:36 UTC
